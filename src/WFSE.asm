@@ -1,6 +1,3 @@
-;testing is quicker like this.
-
-org 0x7c00
 ; di = dest
 ; si = name
 
@@ -8,9 +5,9 @@ _fetch_file:
 	mov  [drive_num], dl
 	; we need to load the first sector (the disk-meta sector
 	mov	 ah, 02h ; read function.
-	mov	 al, 1  ; sectors to read.
-	mov	 ch, 0   ; cylinder.
+	mov	 al, 1   ; sectors to read.
 	mov	 cl, 1   ; sector.
+	mov	 ch, 0   ; cylinder.
 	mov	 dh, 0   ; head.
 	
 	; es:bx points to receiving
@@ -35,9 +32,6 @@ _fetch_file:
 	mov	 es, bx
 	mov	 bx, 0
 	jmp $
+
 drive_num db 0
-
-S dd 0
-
-times 510-($ - $$) db 0
-dw 0xAA55
+File_Sector_Count dd 0

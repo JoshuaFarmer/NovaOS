@@ -1,10 +1,19 @@
-D (D is a 32 bit integer. D = meta sector (which contains the name, and location of the file))
-S (S is a 32 bit integer, deciding how many file pointer sectors exist, this means its not fixed at some value (e.g. 256))
+Sp (Sp is a 16 bit integer. Sp = meta sector pointer (a "meta sector" contains the name, and location of the file))
+By (By is the byte offset (16 bit because there are >255 bytes in each sector)
+Cl (Cl is the cylinder/track (16 bit))
+Hd (Hd is the head (16 bit))
+
+C (C is a 32 bit integer, deciding how many file pointer sectors exist, this means its not fixed at some value (e.g. 256))
+
+ig Hd:Cl:Sp:By means head[Hd].sector[Sp].byteIndex(By)
 
 START OF DISK:
-    "WFSE V1", \0, S, (drive meta data, that we dont care about)
-	D, D, D, D, D...
-    first <S> sectors are for files ((S*512)/4 files max, bitch)
+    "WFSE V1"\0, C, (drive meta data, that we dont care about (fill the rest of the first sector with 0s))
+example pointer:
+	Hd:Cl:Sp:By,
+    first <C> sectors are for files ((C*512)/8 files max, bitch)
 
-(sector <D>):
-    <start> <end> <name> <more meta data that we dont give a shit about>
+(sector <Sp>:<By>):
+    <start> <end> <name>
+(<start>):
+	(data until <end>)

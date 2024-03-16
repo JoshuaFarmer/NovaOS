@@ -443,3 +443,5 @@ hex_to_string:
 	.less_than_9:
 		add al, '0'
 		ret
+
+include "WFSE.asm"

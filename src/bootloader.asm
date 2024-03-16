@@ -86,7 +86,7 @@ check_for_errors:
 	jnc done_with_disk
 	cmp ah, 0
 	je done_with_disk
-	jmp spin 
+	jmp spin
 
 done_with_disk:
 	jmp 0x1000:0000
