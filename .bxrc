@@ -8,6 +8,7 @@ vgaromimage: file="C:\Program Files\Bochs-2.7/VGABIOS-lgpl-latest"
 boot: floppy
 floppy_bootsig_check: disabled=0
 floppya: type=1_44, 1_44="C:\Users\Rhuba\COSA\bin\COSA.img", status=inserted, write_protected=1
+floppyb: type=1_44, 1_44="C:\Users\Rhuba\COSA\hi.img", status=inserted, write_protected=1
 # no floppyb
 ata0: enabled=true, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
 ata0-master: type=none

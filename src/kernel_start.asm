@@ -11,7 +11,6 @@ _kernel_start:
 	mov cx, 0
 	mov dx, 0
 	
-	KeyBoardBuffer = 0xe820
 
 	mov ah, 09h
 	mov cx, 0x1000

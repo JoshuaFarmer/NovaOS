@@ -1,3 +1,5 @@
+KeyboardBuffer = 0xe820
+
 include "kernel_start.asm"
 include "kernel_data.asm"
 jmp kernel_mainloop
@@ -5,13 +7,13 @@ jmp kernel_mainloop
 splash:
 	mov di, SYS_desc
 	call puts
-ret 
-	
+ret
+
 putc:		
-	mov ah, 0eh 
-	int 10h	 
-ret	  
-	
+	mov ah, 0eh
+	int 10h	
+ret	
+
 puts:
 	mov al, [es:di]
 	cmp al, 0
@@ -24,25 +26,25 @@ ret
 	
 getc:	
 	mov ah, 0
-	int 16h  
-ret  
+	int 16h
+ret
 
-gets:  
+gets:
 	call getc
-	call putc 
+	call putc
 	cmp al, 8
 	je .backspace
-	cmp al, 13 
+	cmp al, 13
 	je .end
 	mov [es:di], al
-	inc di 
+	inc di
 	jmp gets
 	.end:
 		mov al, 10
 		int 10h
-ret		  
+ret		
 .backspace:
-	mov al, 20h  
+	mov al, 20h
 	call putc
 	mov al, 8	
 	call putc
@@ -60,8 +62,8 @@ strCpy:
 	mov al, [es:si]   ; Load byte at ES:SI into AL,
 	mov [es:di], al
 	inc si
-	inc di  
-	; Check for null terminator 
+	inc di
+	; Check for null terminator
 	cmp al, 0
 	je .done   ; Jump if null terminator is reached
 	
@@ -85,7 +87,7 @@ strCmp:
 	; Compare characters
 	cmp al, bl
 	jne .not_equal   ; Jump if characters are not equal
-	  
+	
 	; Continue loop
 	jmp .loop
 .not_equal:
@@ -95,18 +97,17 @@ ret
 .equal:
 	; Strings are equal
 	mov ax, 1
-ret 
- 
+ret
+
 clearBuffer:	
-	mov di, KeyBoardBuffer	
+	mov di, KeyboardBuffer	
 	.loop:
 	mov byte[es:di], 0
 	inc di
 	cmp byte[es:di], 0
 	jne .loop
-ret 
- 
- 
+ret
+
 _INST_desc:
 	call splash
 jmp kernel_mainloop
@@ -118,15 +119,15 @@ jmp kernel_mainloop
 
 _INST_user:
 	call clearBuffer
-	mov di, DAT_user_prompt 
-	call puts	   
+	mov di, DAT_user_prompt
+	call puts	
 	mov di, SYS_user		
-	call gets	   
+	call gets	
 	dec di
-	mov byte[es:di], 20h  
+	mov byte[es:di], 20h
 jmp kernel_mainloop
 
-_INST_disk:	 
+_INST_disk:	
 	mov	 ah, 02h ; read function.
 	mov	 al, 10  ; sectors to read.
 	mov	 ch, 0   ; cylinder.
@@ -136,25 +137,42 @@ _INST_disk:
 	
 	; es:bx points to receiving
 	;  data buffer:
-	mov	 bx, 0x8000   
+	mov	 bx, 0x8000
 	mov	 es, bx
 	mov	 bx, 0
 	
 	; read!
-	int	 13h 
-	
-	mov	 bx, 0x1000   
+	int	 13h
+
+	mov	 bx, 0x1000
 	mov	 es, bx
 	mov	 bx, 0
 jmp kernel_mainloop
 
-_INST_run:	 
+_INST_run:
+    mov di, KeyboardBuffer
+	.loop:
+		inc di
+		cmp byte [es:di], 0
+		je .nvm
+		
+		; Compare the last two characters of the command with "-f"
+		cmp byte [es:di-1], '-'
+		jne .loop
+		cmp byte [es:di], 'f'
+		jne .loop
+		
+		; If "-f" is found, jump to the success label
+		jmp .run_success
+
+	.nvm:
+
 	mov al, 0x90
 	push 0x8000
 	pop es
 	mov si, 0
 	
-	cmp [es:si], al 
+	cmp [es:si], al
 	je .run_success
 	.run_error:
 		push 0x1000
@@ -167,10 +185,27 @@ _INST_run:
 		mov ds, bx
 		mov es, bx
 		call 0x8000:0x0000
+	.run_end:
 		push 0x1000
 		pop  es
 		push 0x0
 		pop  ds
+		
+		mov [es:DAT_exit_code], ax
+		mov di, DAT_exit_code_msg
+		call puts
+
+		mov ax, [es:DAT_exit_code]
+		call hex_to_string
+		push ax
+		call putc
+		pop ax
+		mov  al, ah
+		call putc
+
+		mov di, DAT_new_line
+		call puts
+	
 	jmp kernel_mainloop
 
 _INST_cls:
@@ -187,68 +222,68 @@ kernel_mainloop:
 	
 	mov di, SYS_user
 	call puts
-			 
+			
 	mov di, SYS_prompt
 	call puts
 	
 	; get user input
-	mov di, KeyBoardBuffer   
-	call gets	   
+	mov di, KeyboardBuffer
+	call gets	
 		
 	; help command
 	mov si, INST_help
-	mov di, KeyBoardBuffer  
+	mov di, KeyboardBuffer
 	call strCmp
-	cmp ax, 1 
+	cmp ax, 1
 	je _INST_help
 	
 	; splash screen command
 	mov si, INST_desc
-	mov di, KeyBoardBuffer  
+	mov di, KeyboardBuffer
 	call strCmp
-	cmp ax, 1 
+	cmp ax, 1
 	je _INST_desc
 	
 	; change user command
 	mov si, INST_user
-	mov di, KeyBoardBuffer  
+	mov di, KeyboardBuffer
 	call strCmp
-	cmp ax, 1 
+	cmp ax, 1
 	je _INST_user
 	
 	; load disk
 	mov si, INST_disk
-	mov di, KeyBoardBuffer  
+	mov di, KeyboardBuffer
 	call strCmp
-	cmp ax, 1 
-	je _INST_disk  
+	cmp ax, 1
+	je _INST_disk
 	
 	; run
 	mov si, INST_run
-	mov di, KeyBoardBuffer  
+	mov di, KeyboardBuffer
 	call strCmp
-	cmp ax, 1 
+	cmp ax, 1
 	je _INST_run
 
 	; clear command
 	mov si, INST_cls
-	mov di, KeyBoardBuffer  
+	mov di, KeyboardBuffer
 	call strCmp
-	cmp ax, 1 
+	cmp ax, 1
 	je _INST_cls
 
 	; check if the user wants to edit
 	mov si, INST_monitor
-	mov di, KeyBoardBuffer  
+	mov di, KeyboardBuffer
 	call strCmp
 	cmp ax, 1
 	je _INST_monitor
 
 	; check if the user wants to reboot
 	mov si, INST_reboot
-	mov di, KeyBoardBuffer  
-	call strCmp 
-	cmp ax, 1	 
+	mov di, KeyboardBuffer
+	call strCmp
+	cmp ax, 1	
 	je reboot
 	
 	jmp kernel_mainloop
@@ -310,6 +345,8 @@ _INST_monitor:
 			pop ax
 			mov  al, ah
 			call putc
+			mov al, ' '
+			call putc
 
 			loop .viewloop
 
@@ -319,7 +356,7 @@ _INST_monitor:
 		.backspace.loop:
 			mov al, 8	; one backspace
 			call putc
-			mov al, 20h  
+			mov al, 20h
 			call putc
 			mov al, 8	
 			call putc
