@@ -2,7 +2,7 @@ D (D is a 32 bit integer. D = meta sector (which contains the name, and location
 S (S is a 32 bit integer, deciding how many file pointer sectors exist, this means its not fixed at some value (e.g. 256))
 
 START OF DISK:
-    "WFSE V1", S, (drive meta data, that we dont care about)
+    "WFSE V1", \0, S, (drive meta data, that we dont care about)
 	D, D, D, D, D...
     first <S> sectors are for files ((S*512)/4 files max, bitch)
 
