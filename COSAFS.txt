@@ -7,4 +7,4 @@ START OF DISK:
     first <S> sectors are for files ((S*512)/4 files max, bitch)
 
 (sector <D>):
-    <start> <end> <name>
+    <start> <end> <name> <more meta data that we dont give a shit about>
