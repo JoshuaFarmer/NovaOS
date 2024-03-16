@@ -1,8 +1,8 @@
-D	(D is a 32 bit integer. D = meta sector (which contains the name, and location))
+D (D is a 32 bit integer. D = meta sector (which contains the name, and location of the file))
 
 START OF DISK:
-	D, D, D, D, D...
-	first 256 sectors are for files (32768 files max)
+    D, D, D, D, D...
+    first 256 sectors are for files (32768 files max, bitch)
 
-(sector <location>):
-	<start> <end> <name>
+(sector <D>):
+    <start> <end> <name>
