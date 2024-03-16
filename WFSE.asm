@@ -1,3 +1,5 @@
+;testing is quicker like this.
+
 org 0x7c00
 ; di = dest
 ; si = name
@@ -34,6 +36,8 @@ _fetch_file:
 	mov	 bx, 0
 	jmp $
 drive_num db 0
+
+S dd 0
 
 times 510-($ - $$) db 0
 dw 0xAA55
