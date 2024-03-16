@@ -1,7 +1,8 @@
-Sp (Sp is a 16 bit integer. Sp = meta sector pointer (a "meta sector" contains the name, and location of the file))
 By (By is the byte offset (16 bit because there are >255 bytes in each sector)
-Cl (Cl is the cylinder/track (16 bit))
-Hd (Hd is the head (16 bit))
+
+Sp (Sp is a 8 bit integer. Sp = meta sector pointer (a "meta sector" contains the name, and location of the file))
+Cl (Cl is the cylinder/track (8 bit))
+Hd (Hd is the head (8 bit))
 
 C (C is a 32 bit integer, deciding how many file pointer sectors exist, this means its not fixed at some value (e.g. 256))
 
@@ -11,7 +12,7 @@ START OF DISK:
     "WFSE V1"\0, C, (drive meta data, that we dont care about (fill the rest of the first sector with 0s))
 example pointer:
 	Hd:Cl:Sp:By,
-    first <C> sectors are for files ((C*512)/8 files max, bitch)
+    first <C> sectors are for file pointers
 
 (sector <Sp>:<By>):
     <start> <end> <name>
