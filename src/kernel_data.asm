@@ -25,6 +25,8 @@ dat:
 	INST_monitor db "mon", 0
 	INST_run     db "run", 0 ; run code from 0x8000
 	
+	INST_WFSE    db "WFSE", 0
+	
 	; gp data
 	DAT_run_error	  db "unable to start program :(", 10, 13, 0
 	
@@ -33,5 +35,4 @@ dat:
 
 	DAT_user_prompt	  db "enter your name: ", 0
 	DAT_new_line      db 13, 10, 0
-
 dat_t:

@@ -1,0 +1,15 @@
+Sp (Sp is a 8 bit integer. Sp = meta sector pointer (a "meta sector" contains the name, and location of the file))
+C (C is a 16 bit integer, deciding how many file pointer sectors exist, this means its not fixed at some value (e.g. 256))
+
+pointer = Sp
+
+START OF FS (sector 4):
+    "WFSE V1"\0, C, (drive meta data, that we dont care about (fill the rest of the first sector with 0s))
+example pointer:
+	pointer, pointer
+    first <C> sectors are for file pointers
+
+(sector <Sp>):
+    <start sector> <end sector> <cylinder> <head> <name> <meta>
+(<start>):
+	(data until <end>)

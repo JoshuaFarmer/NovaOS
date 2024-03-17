@@ -2,6 +2,11 @@ KeyboardBuffer = 0xe820
 
 include "kernel_start.asm"
 include "kernel_data.asm"
+call beep
+call init_wfse
+mov  bx, 0
+call get_file_meta
+
 jmp kernel_mainloop
 
 splash:
@@ -444,4 +449,20 @@ hex_to_string:
 		add al, '0'
 		ret
 
-include "WFSE.asm"
+; al
+_print_hex:
+	push ax
+	call putc
+	pop ax
+	mov  al, ah
+	call putc
+	mov al, ' '
+	call putc
+	call hex_to_string
+ret
+
+; sound
+include "sound.asm"
+
+; WFSE
+include "wfse.asm"
