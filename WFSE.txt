@@ -1,6 +1,5 @@
 note: 1 pointer is 32 bits (4 bytes).
 
-
 Sp (Sp is a 8 bit integer. Sp = meta sector pointer (a "meta sector" contains the name, and location of the file))
 Cl (Cl is the cylinder/track (8 bit))
 Hd (Hd is the head (8 bit))
@@ -19,6 +18,5 @@ example pointer:
     first <C> sectors are for file pointers
 
 (sector <Sp>):
-    <start sector> <end sector> <cylinder> <head> <drive> <name> <meta>
-(<start>):
+    <start sector> <end sector> <name> <meta for the rest of the first sector>
     (data until <end>)
