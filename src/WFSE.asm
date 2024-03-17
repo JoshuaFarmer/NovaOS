@@ -79,5 +79,7 @@ wfse_ptr dw 0 ; file pointer                   (16 bit)
 wfse_fs_meta  db 4
 wfse_fs_start db 5
 
+; 4kb per program sector
+wfse_buffer_size = 8
 wfse_buffer:
-	times 512 db 0
+	times 512*wfse_buffer_size db 0
