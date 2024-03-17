@@ -7,9 +7,9 @@ call beep
 ; get meta data and information
 call init_wfse
 
-; get meta data of "hi.txt"
+; wfse
 mov  bx, 1
-call wfse_fetch
+call _wfse_get_pointer
 
 jmp kernel_mainloop
 

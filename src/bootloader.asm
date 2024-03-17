@@ -32,7 +32,7 @@ org 0x7C00
         nt_flags: db 0
         sig: db 0x28
         volume: dd 0
-        volume_name: db "SMTH     "
+        volume_name: db "COSA     "
         sys: db "FAT32 "
 
 ; We have to start somewhere, we use _start out of convention.
@@ -57,7 +57,7 @@ _start:
         ; Now we're going to load data from disk.
         ; No filesystem yet.
         mov ah, 2
-        mov al, 16 ; 16 sectors
+        mov al, 4
         mov cx, 2
         ; Some bad BIOS'es don't pass the disk number.
         cmp dl, 0xFF
