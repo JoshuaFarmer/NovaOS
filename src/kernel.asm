@@ -3,8 +3,12 @@ KeyboardBuffer = 0xe820
 include "kernel_start.asm"
 include "kernel_data.asm"
 call beep
+
+; get meta data and information
 call init_wfse
-mov  bx, 0
+
+; get meta data of "hi.txt"
+mov  bx, 1
 call get_file_meta
 
 jmp kernel_mainloop
