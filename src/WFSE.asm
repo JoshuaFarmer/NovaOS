@@ -88,3 +88,4 @@ wfse_buffer:
 	times 512*wfse_buffer_size db 0
 
 times 512*16-($-$$) db 0
+db "WFSE V1", 0, 8
