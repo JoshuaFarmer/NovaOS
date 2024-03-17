@@ -8,8 +8,10 @@ call beep
 call init_wfse
 
 ; wfse
-mov  bx, 1
-call _wfse_get_pointer
+call wfse_meta
+
+; try read file
+call wfse_ls
 
 jmp kernel_mainloop
 
@@ -159,23 +161,6 @@ _INST_disk:
 jmp kernel_mainloop
 
 _INST_run:
-    mov di, KeyboardBuffer
-	.loop:
-		inc di
-		cmp byte [es:di], 0
-		je .nvm
-		
-		; Compare the last two characters of the command with "-f"
-		cmp byte [es:di-1], '-'
-		jne .loop
-		cmp byte [es:di], 'f'
-		jne .loop
-		
-		; If "-f" is found, jump to the success label
-		jmp .run_success
-
-	.nvm:
-
 	mov al, 0x90
 	push 0x8000
 	pop es

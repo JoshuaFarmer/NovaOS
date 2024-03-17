@@ -1,6 +1,5 @@
 _kernel_start:
 	pop dx
-	mov [wfse_Drive], dl
 	call clear_scr
 	push 0
 	pop ds

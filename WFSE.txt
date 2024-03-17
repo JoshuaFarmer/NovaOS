@@ -11,7 +11,7 @@ ig Dr:Hd:Cl:Sp means drive.[Dr].head[Hd].track.[Cl].sector[Sp]
 
 pointer = Dr:Hd:Cl:Sp
 
-START OF FS (sector 4):
+START OF FS (sector 5):
     "WFSE V1"\0, C, (drive meta data, that we dont care about (fill the rest of the first sector with 0s))
 example pointers:
     pointer, pointer, pointer, pointer, pointer
