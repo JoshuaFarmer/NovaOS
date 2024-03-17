@@ -57,7 +57,7 @@ _start:
         ; Now we're going to load data from disk.
         ; No filesystem yet.
         mov ah, 2
-        mov al, 10
+        mov al, 16 ; 16 sectors
         mov cx, 2
         ; Some bad BIOS'es don't pass the disk number.
         cmp dl, 0xFF

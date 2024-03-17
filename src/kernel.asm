@@ -9,7 +9,7 @@ call init_wfse
 
 ; get meta data of "hi.txt"
 mov  bx, 1
-call get_file_meta
+call wfse_fetch
 
 jmp kernel_mainloop
 
