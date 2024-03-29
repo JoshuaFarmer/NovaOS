@@ -2,6 +2,11 @@ wfse_diskinfo_buffer = 0x8000
 wfse_ptr_buffer      = 0x81ff
 wfse_buffer          = 0x83FF
 
+; file [bx]
+wfse_read:
+	
+	ret
+
 init_wfse:
     ; Load FS meta into memory
     mov ah, 2 ; read disk sectors function
@@ -44,7 +49,7 @@ wfse_get_ptrs:
 wfse_ls:
 	mov bx, 1
 	.loop:
-		call wfse_fetch
+		call wfse_print_name
 		mov al, 13
 		call putc
 		mov al, 10
@@ -54,7 +59,7 @@ wfse_ls:
 	ret
 
 ; get file data from pointer [bx]
-wfse_fetch:
+wfse_print_name:
 	call _wfse_get_file_meta
 	push wfse_buffer
 	pop  es
@@ -73,7 +78,7 @@ wfse_fetch:
 	
 	mov  [wfse_File_Len], al
 	ret
-	; get meta data from pointer [bx]
+; get meta data from pointer [bx]
 _wfse_get_file_meta:
 		call _wfse_get_pointer
 		; Read file pointers
@@ -175,11 +180,11 @@ ret
 	call puts
 ret
 
-wfse_Sp  db 0 ; meta sector pointer            (8 bit)
-wfse_Cl  db 0 ; cylinder/track                 (8 bit)
-wfse_Hd  db 0 ; head                           (8 bit)
-wfse_Dr  db 0 ; drive                          (8 bit)
-wfse_Drive  db 0 ; drive                          (8 bit)
+wfse_Sp    db 0 ; meta sector pointer            (8 bit)
+wfse_Cl    db 0 ; cylinder/track                 (8 bit)
+wfse_Hd    db 0 ; head                           (8 bit)
+wfse_Dr    db 0 ; drive                          (8 bit)
+wfse_Drive db 0 ; drive                          (8 bit)
 
 wfse_File_Len    db 0
 wfse_File_Name:  times 24 db 0
@@ -190,18 +195,18 @@ wfse_fs_meta  db 6
 wfse_fs_start db 7
 
 wfse_start_msg db "WFSE has been initialized", 13, 10, 0
-wfse_error_msg db "failed to initialize WFSE", 13, 10, 0
+wfse_error_msg db "Failed to initialize WFSE", 13, 10, 0
 
 times 512*4-($-$$) db 0
-db "WFSE V1", 0, 1, "test drive 1", 0
+db "WFSE V1", 0, 1, "COSA Drive", 0
 times 512*5-($-$$) db 0 
 
 db 1, 0, 0, 8
 
 times 512*6-($-$$) db 0
 
-_hello:
-	db 1, "hi.txt", 0
+_WFSECOSA:
+	db 1, "COSA.sys", 0
 	times 512*7-($-$$) db 0
-	db "hello world!", 0
+	db "COSA is not actually accessible by WFSE, as it is located on sector 1", 0
 	times 512*8-($-$$) db 0

@@ -4,15 +4,11 @@ include "kernel_start.asm"
 include "kernel_data.asm"
 call beep
 
-; get meta data and information
 call init_wfse
-
-; wfse
 call wfse_meta
-
-; try read file
 call wfse_ls
 
+call mouse_start
 jmp kernel_mainloop
 
 splash:
@@ -20,9 +16,13 @@ splash:
 	call puts
 ret
 
-putc:		
-	mov ah, 0eh
-	int 10h	
+putc:
+	pusha
+	mov ah, 0xE
+	mov bh, 0
+	mov bl, [es:SYS_colour]
+	int 10h
+	popa
 ret	
 
 puts:
@@ -51,6 +51,7 @@ gets:
 	inc di
 	jmp gets
 	.end:
+		mov ah, 0xE
 		mov al, 10
 		int 10h
 ret		
@@ -204,16 +205,13 @@ _INST_run:
 
 _INST_cls:
 	call clear_scr
-	mov ah, 09h
-	mov cx, 1000h
-	mov al, 20h
-	mov bl, 17h
 	int 10h
 jmp kernel_mainloop
 
 kernel_mainloop:
 	call clearBuffer
-	
+	call read_mouse
+
 	mov di, SYS_user
 	call puts
 			
@@ -320,11 +318,6 @@ _INST_monitor:
 		jmp .loop
 	.clear:
 		call clear_scr
-		mov ah, 09h
-		mov cx, 1000h
-		mov al, 20h
-		mov bl, 17h
-		int 10h
 		jmp .loop
 	.view:
 		mov cx, 128
@@ -451,7 +444,10 @@ _print_hex:
 ret
 
 ; sound
-include "sound.asm"
+include "kernel_sound.asm"
+
+; Mouse
+include "kernel_mouse.asm"
 
 ; WFSE
 include "wfse.asm"

@@ -50,8 +50,8 @@ _start:
         ; Now we're fine.
 
    
-        ; Prepare ourselves for 80x25 text mode.
-        mov al, 3
+        ; Prepare ourselves for 640x200 graphics mode.
+        mov ax, 0x13
         int 0x10
 
         ; Now we're going to load data from disk.

@@ -5,14 +5,15 @@ dat:
 			db "splash      |       display the splash screen", 10, 13 
 			db "help        |       show this list", 10, 13
 			db "get         |       read the contents of disk 1", 10, 13
-			db "run         |       run code from 8000h", 10, 13, 0
-			db "mon         |       very bad monitor program", 10, 13, 0
+			db "run         |       run code from 8000h", 10, 13
+			db "mon         |       very bad monitor program", 10, 13
 			db "set-user    |       change the prompt user", 10, 13, 0
 	SYS_desc     db "Computer Operating System A.", 10, 13, "Kernel Version 0.3", 10, 13, "(C) Joshua Farmer 2023", 10, 13, 0
-	
+
+	SYS_colour	 db 0x1F
 	SYS_prompt   db "> ", 0    
 	SYS_user     db "sys", 20h, 0
-
+	times 24	 db 0
 
 	; system commands
 	INST_reboot db "reboot", 0

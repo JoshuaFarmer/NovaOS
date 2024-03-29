@@ -15,7 +15,7 @@ _kernel_start:
 	mov ah, 09h
 	mov cx, 0x1000
 	mov al, 20h
-	mov bl, 17h
+	mov bl, [es:SYS_colour]
 	int 10h
 
 	mov ah, 0x02
@@ -27,6 +27,7 @@ clear_scr:
 	pusha
 	mov ah, 0x00
 	mov al, 0x03  ; text mode 80x25 16 colours
+	mov bl, [es:SYS_colour]
 	int 0x10
 	popa
 	ret
