@@ -114,43 +114,52 @@ wfse_get_ptrs:
     ret
 
 wfse_ls:
-	mov bx, 0
+	mov bx, 1
 	.loop:
 		inc bx
 		call wfse_print_name
-		cmp  ax, 1x
+		cmp  ax, 1
 		jne .loop
 	ret
 
 ; get file data from pointer [bx]
 wfse_print_name:
+	; save shit
+	pusha
+
+	; get teh meta-data
 	call _wfse_get_file_meta
+
+	; error checking
 	cmp  ax, 1
-	jmp  .nvm
-	push wfse_buffer
-	pop  es
+	je   .nvm
 
-	mov  si, 0
-	mov  al, [es:si]
-	push ax
+	; y e s
+	mov  cx, wfse_buffer
+	mov  es, cx
 
+	; print teh fucking name
 	mov  di, 1
 	call puts
 
-	pop  ax
-
-	push 0x1000
-	pop  es
+	; snap back to reality
+	mov  cx, 0x1000
+	mov  es, cx
 	
+	; insert new line
 	mov al, 13
 	call putc
 	mov al, 10
 	call putc
 
-	mov  [wfse_File_Len], al
+	; restore shit
+	popa
 	ret
 .nvm:
+	; error code
 	mov ax, 1
+	; restore shit
+	popa
 	ret
 
 ; get meta data from pointer [bx]

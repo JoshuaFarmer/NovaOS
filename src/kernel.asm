@@ -6,7 +6,6 @@ call beep
 
 call init_wfse
 call wfse_meta
-call wfse_ls
 
 call mouse_start
 jmp kernel_mainloop
@@ -207,6 +206,10 @@ _INST_cls:
 	call clear_scr
 jmp kernel_mainloop
 
+_INST_ls:
+	call wfse_ls
+jmp kernel_mainloop
+
 kernel_mainloop:
 	call clearBuffer
 	call read_mouse
@@ -221,6 +224,13 @@ kernel_mainloop:
 	mov di, KeyboardBuffer
 	call gets	
 		
+	; ls command
+	mov si, INST_ls
+	mov di, KeyboardBuffer
+	call strCmp
+	cmp ax, 1
+	je _INST_ls
+
 	; help command
 	mov si, INST_help
 	mov di, KeyboardBuffer

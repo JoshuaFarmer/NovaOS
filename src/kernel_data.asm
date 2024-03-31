@@ -21,6 +21,7 @@ dat:
 	INST_help   db "help", 0
 	INST_user   db "set-user", 0
 	INST_cls    db "cls", 0
+	INST_ls     db "ls", 0
 
 	INST_disk    db "get", 0
 	INST_monitor db "mon", 0
