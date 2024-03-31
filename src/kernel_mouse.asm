@@ -1,4 +1,4 @@
-; testing
+; testing, only for SOME bios's
 mouse_start:
 	mov ax, 0
 	int 0x33

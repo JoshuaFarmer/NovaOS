@@ -205,7 +205,6 @@ _INST_run:
 
 _INST_cls:
 	call clear_scr
-	int 10h
 jmp kernel_mainloop
 
 kernel_mainloop:
@@ -278,6 +277,9 @@ kernel_mainloop:
 	cmp ax, 1	
 	je reboot
 	
+	; execute files
+	call wfse_get_file
+
 	jmp kernel_mainloop
 reboot:
 	db 0x0ea

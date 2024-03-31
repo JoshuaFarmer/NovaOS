@@ -1,11 +1,78 @@
 wfse_diskinfo_buffer = 0x8000
 wfse_ptr_buffer      = 0x81ff
-wfse_buffer          = 0x83FF
+wfse_buffer          = 0x83ff
 
-; file [bx]
-wfse_read:
-	
+; es:di = KeyboardBuffer (name)
+wfse_get_file:
+	push ds
+	push es
+
+	push wfse_ptr_buffer
+	pop  ds
+
+	; do shit here
+	mov  bx, 1
+	.loop:
+		push 0x1000
+		pop  es
+		call .fetch_name
+		inc  bx
+		call .cmp
+		cmp  ax, 1
+		jne  .loop
+	mov  di, 1
+	push wfse_ptr_buffer
+	pop  es
+	call puts
+
+	; restore shit
+	pop  es
+	pop  ds
+ret
+	.nvm:
+		pop es
+		pop ds
+		mov di, wfse_file_not_found
+		call puts
 	ret
+
+	.fetch_name:
+		call _wfse_get_file_meta
+		cmp  ax, 1
+		je   .nvm
+
+		push wfse_buffer
+		pop  es
+
+		mov  si, 1
+	ret
+
+	.cmp:
+	; Compare strings in a loop
+		.cmploop:
+			; Load characters from each string
+		mov al, [ds:SI]   ; Load byte at ES:SI into AL,
+		mov bl, [es:DI]
+		inc si
+		inc di
+		; Check for null terminator
+		cmp al, 0
+		je .cmpequal   ; Jump if null terminator is reached
+		
+		; Compare characters
+		cmp al, bl
+		jne .cmpnot_equal   ; Jump if characters are not equal
+		
+		; Continue loop
+		jmp .cmploop
+	.cmpnot_equal:
+		; Strings are not equal
+		mov ax, 0
+	ret
+	.cmpequal:
+		; Strings are equal
+		mov ax, 1
+ret
 
 init_wfse:
     ; Load FS meta into memory
@@ -47,20 +114,19 @@ wfse_get_ptrs:
     ret
 
 wfse_ls:
-	mov bx, 1
+	mov bx, 0
 	.loop:
+		inc bx
 		call wfse_print_name
-		mov al, 13
-		call putc
-		mov al, 10
-		call putc
-		cmp [wfse_Sp], 0
+		cmp  ax, 1x
 		jne .loop
 	ret
 
 ; get file data from pointer [bx]
 wfse_print_name:
 	call _wfse_get_file_meta
+	cmp  ax, 1
+	jmp  .nvm
 	push wfse_buffer
 	pop  es
 
@@ -76,11 +142,22 @@ wfse_print_name:
 	push 0x1000
 	pop  es
 	
+	mov al, 13
+	call putc
+	mov al, 10
+	call putc
+
 	mov  [wfse_File_Len], al
 	ret
+.nvm:
+	mov ax, 1
+	ret
+
 ; get meta data from pointer [bx]
 _wfse_get_file_meta:
 		call _wfse_get_pointer
+		cmp [wfse_Sp], 0
+		je  .nvm
 		; Read file pointers
 		mov ah, 2 ; read disk sectors function
 		mov al, 1 ; number of sectors to read
@@ -88,14 +165,21 @@ _wfse_get_file_meta:
 		mov cl, [es:wfse_Sp]    ; sector number (start from next sector after FS start)
 		mov dh, [es:wfse_Hd]    ; head number
 		mov dl, [es:wfse_Drive] ; drive number
+		
 		mov bx, wfse_buffer ; buffer to read data into
 		mov es, bx
 		xor bx, bx
 		int 0x13 ; BIOS interrupt
 
+		mov  ax, 0
 		push 0x1000
 		pop  es
 		ret
+	.nvm:
+		mov bx, 0x1000
+		mov es, bx
+		mov  ax, 1
+	ret
 ; Parse file pointer at index [bx]
 _wfse_get_pointer:
 		push wfse_ptr_buffer
@@ -195,7 +279,8 @@ wfse_fs_meta  db 6
 wfse_fs_start db 7
 
 wfse_start_msg db "WFSE has been initialized", 13, 10, 0
-wfse_error_msg db "Failed to initialize WFSE", 13, 10, 0
+wfse_error_msg db "WFSE Error 0x0: Failed to initialize WFSE", 13, 10, 0
+wfse_file_not_found db "WFSE Error 0x1: File not found", 13, 10, 0
 
 times 512*4-($-$$) db 0
 db "WFSE V1", 0, 1, "COSA Drive", 0
