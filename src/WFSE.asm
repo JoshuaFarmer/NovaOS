@@ -18,8 +18,7 @@ wfse_get_file:
 		call .fetch_name
 		inc  bx
 		call .cmp
-		cmp  ax, 1
-		jne  .loop
+		jnz  .loop
 	mov  di, 1
 	push wfse_ptr_buffer
 	pop  es
@@ -114,12 +113,14 @@ wfse_get_ptrs:
     ret
 
 wfse_ls:
+	pusha
 	mov bx, 1
 	.loop:
 		inc bx
 		call wfse_print_name
 		cmp  ax, 1
 		jne .loop
+	popa
 	ret
 
 ; get file data from pointer [bx]
@@ -164,6 +165,7 @@ wfse_print_name:
 
 ; get meta data from pointer [bx]
 _wfse_get_file_meta:
+		pusha
 		call _wfse_get_pointer
 		cmp [wfse_Sp], 0
 		je  .nvm
@@ -183,60 +185,63 @@ _wfse_get_file_meta:
 		mov  ax, 0
 		push 0x1000
 		pop  es
+		popa
 		ret
 	.nvm:
 		mov bx, 0x1000
 		mov es, bx
+		popa
 		mov  ax, 1
 	ret
 ; Parse file pointer at index [bx]
 _wfse_get_pointer:
-		push wfse_ptr_buffer
-		pop  es
+	pusha
+	push wfse_ptr_buffer
+	pop  es
+	
+	; get the index of the pointer
+	mov ax, bx
+	mov bx, 4
+	mul bx
+	
+	sub bx, 3 ; goto start pos
+	mov si, bx
+
+	push si
+
+	mov al, [es:si]
+	push ax
+	inc si
+
+	mov al, [es:si]
+	push ax
+	inc si
 		
-		; get the index of the pointer
-		mov ax, bx
-		mov bx, 4
-		mul bx
-
-		sub bx, 3 ; goto start pos
-
-		mov si, bx
-
-		push si
-
-		mov al, [es:si]
-		push ax
-		inc si
-
-		mov al, [es:si]
-		push ax
-		inc si
+	mov al, [es:si]
+	push ax
+	inc si
 		
-		mov al, [es:si]
-		push ax
-		inc si
-		
-		mov al, [es:si]
-		push ax
+	mov al, [es:si]
+	push ax
 
-		push 0x1000
-		pop  es
+	push 0x1000
+	pop  es
 
-		pop  si
-		mov [es:wfse_ptr], si ; save ram location
-		pop  ax
-		mov [es:wfse_Sp],  al ; load Sp from pointer
-		pop  ax
-		mov [es:wfse_Cl],  al ; load Cl from pointer
-		pop  ax
-		mov [es:wfse_Hd],  al ; load Hd from pointer
-		pop  ax
-		mov [es:wfse_Dr],  al ; load Dr from pointer
-		
-		ret
+	pop  si
+	mov [es:wfse_ptr], si ; save ram location
+	pop  ax
+	mov [es:wfse_Sp],  al ; load Sp from pointer
+	pop  ax
+	mov [es:wfse_Cl],  al ; load Cl from pointer
+	pop  ax
+	mov [es:wfse_Hd],  al ; load Hd from pointer
+	pop  ax
+	mov [es:wfse_Dr],  al ; load Dr from pointer
+	popa
+	ret
 
 wfse_meta:
+	pusha
 	push wfse_diskinfo_buffer
 	pop  es
 	
@@ -267,10 +272,12 @@ wfse_meta:
 
 	mov di, wfse_start_msg
 	call puts
+	popa
 ret
 .error:
 	mov di, wfse_error_msg	
 	call puts
+	popa
 ret
 
 wfse_Sp    db 0 ; meta sector pointer            (8 bit)

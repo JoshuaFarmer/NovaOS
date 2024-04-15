@@ -1,22 +1,2 @@
-note: 1 pointer is 32 bits (4 bytes).
-
-Sp (Sp is a 8 bit integer. Sp = meta sector pointer (a "meta sector" contains the name, and location of the file))
-Cl (Cl is the cylinder/track (8 bit))
-Hd (Hd is the head (8 bit))
-Dr (Dr is the drive number (8 bit))
-
-C (C is a 16 bit integer, deciding how many file pointer sectors exist, this means its not fixed at some value (e.g. 256))
-
-ig Dr:Hd:Cl:Sp means drive.[Dr].head[Hd].track.[Cl].sector[Sp]
-
-pointer = Dr:Hd:Cl:Sp
-
-START OF FS (sector 5):
-    "WFSE V1"\0, C, (drive meta data, that we dont care about (fill the rest of the first sector with 0s))
-example pointers:
-    pointer, pointer, pointer, pointer, pointer
-    first <C> sectors are for file pointers
-
-(sector <Sp>):
-    <file len (sectors (8 bit))> <name> <meta for the rest of the first sector>
-    (data until <end>)
+the structure is very simple
+<file len (sectors (if zero, use the rest of this sector))> "name\0" <data>

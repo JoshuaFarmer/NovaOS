@@ -1,6 +1,6 @@
 cd src
-fasm "Bootloader.asm" "../bin/Load.bin"
-fasm "Kernel.asm" "../bin/Kernel.bin"
+nasm "Bootloader.asm" "../bin/Load.bin"
+nasm "Kernel.asm" "../bin/Kernel.bin"
 cd ../bin
 del COSA.img
 del COSA.bin
