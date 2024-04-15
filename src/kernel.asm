@@ -1,11 +1,8 @@
-KeyboardBuffer = 0xe820
+KeyboardBuffer equ 0xe820
 
-include "kernel_start.asm"
-include "kernel_data.asm"
+%include "kernel_start.asm"
+%include "kernel_data.asm"
 call beep
-
-call init_wfse
-call wfse_meta
 
 call mouse_start
 jmp kernel_mainloop
@@ -207,7 +204,7 @@ _INST_cls:
 jmp kernel_mainloop
 
 _INST_ls:
-	call wfse_ls
+	;call wfse_ls
 jmp kernel_mainloop
 
 kernel_mainloop:
@@ -288,7 +285,7 @@ kernel_mainloop:
 	je reboot
 	
 	; execute files
-	call wfse_get_file
+	; call wfse_get_file
 
 	jmp kernel_mainloop
 reboot:
@@ -456,10 +453,10 @@ _print_hex:
 ret
 
 ; sound
-include "kernel_sound.asm"
+%include "kernel_sound.asm"
 
 ; Mouse
-include "kernel_mouse.asm"
+%include "kernel_mouse.asm"
 
 ; WFSE
-include "wfse.asm"
+; %include "wfse.asm"
