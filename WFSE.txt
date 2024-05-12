@@ -1,2 +1,0 @@
-the structure is very simple
-<file len (sectors (if zero, use the rest of this sector))> "name\0" <data>

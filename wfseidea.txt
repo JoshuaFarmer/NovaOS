@@ -1,4 +1,0 @@
-what if we stored the data in just a list
-<pointer> and then the data
-so searching would still be fast as the pointer contains the file len (in sectors).
-hmmmmmmm
