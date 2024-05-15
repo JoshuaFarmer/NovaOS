@@ -2,7 +2,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* This tutorial will only work for the 32-bit ix86 targets. */
 #if !defined(__i386__)
 #error "This tutorial needs to be compiled with a ix86-elf compiler"
 #endif
@@ -10,6 +9,7 @@
 #include "kernel32.h"
 #include "video.h"
 
+// Setup VGA buffer. Initialize the VGA frame buffer. (I think - x4exr)
 void clsscr() {
 	for (size_t y = 0; y < VGA_HEIGHT; y++) {
 		for (size_t x = 0; x < VGA_WIDTH; x++) {
