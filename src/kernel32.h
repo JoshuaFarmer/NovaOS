@@ -3,7 +3,6 @@
 #define KEYBOARD_STATUS_PORT 0x64
 #define KEYBOARD_DATA_PORT 0x60
 
-
 void putc(char c);
 void putcc(char c, uint8_t col);
 
@@ -317,6 +316,23 @@ void putc(char c) {
 	}
 	outb(0xe9, c);
 	update_cursor(txtx, txty);
+}
+
+uint8_t hchar(uint8_t c) {
+	c&=15;
+	if (c <= 9) {
+		return c + '0';
+	} else if (c >= 0xA && c <= 0xF) {
+		return c + ('A'-10);
+	}
+	return 0;
+}
+
+void puth(uint8_t a) {
+	char c = hchar(a>>4);
+	putc(c);
+	c = hchar(a&15);
+	putc(c);
 }
 
 void putcc(char c, uint8_t col)  {
@@ -653,11 +669,14 @@ typedef struct {
 	uint8_t fs_type[8];
 	uint8_t boot_code[420];
 	uint16_t boot_sector_signature;
-} __attribute__((packed)) FAT32BootSector;
+} FAT32BootSector;
 
-FAT32BootSector* read_boot_sector(uint8_t drive) {
-	FAT32BootSector* boot_sector = (FAT32BootSector*)malloc(sizeof(FAT32BootSector));
-	LBA28_read_sector(drive, 0, 1, (uint16_t*)boot_sector);
+FAT32BootSector read_boot_sector(uint8_t drive) {
+	FAT32BootSector boot_sector;
+	memset(&boot_sector, 0, sizeof(FAT32BootSector)); // Initialize struct with zeros
+	
+	LBA28_read_sector(drive, 1, 1, (uint16_t*)&boot_sector); // Corrected pointer cast
+	
 	return boot_sector;
 }
 
@@ -711,7 +730,7 @@ typedef struct {
 	uint16_t last_modification_date;
 	uint16_t first_cluster_low;
 	uint32_t file_size;
-} __attribute__((packed)) DirectoryEntry;
+} DirectoryEntry;
 
 void read_file(uint8_t drive, FAT32BootSector* boot_sector, const char* filepath) {
 	uint32_t cluster = boot_sector->root_cluster;
@@ -777,4 +796,25 @@ void read_file(uint8_t drive, FAT32BootSector* boot_sector, const char* filepath
 	putsc("File not found: ", VGA_COLOR_LIGHT_RED);
 	puts(filepath);
 	putc('\n');
+}
+
+void list_files(uint8_t drive, FAT32BootSector* boot_sector) {
+	uint32_t cluster = boot_sector->root_cluster;
+	puth(cluster>>24);
+	puth(cluster>>16);
+	puth(cluster>>8);
+	puth(cluster);
+	DirectoryEntry dir_entry;
+	puts("\nlisting\n");
+	// Traverse the directory tree to find the directory
+	while (cluster < 0x0FFFFFF8) {
+		uint32_t sector = boot_sector->reserved_sectors + boot_sector->fat_count * boot_sector->sectors_per_fat + (cluster - 2) * boot_sector->sectors_per_cluster;
+		uint16_t sector_buffer[SECTOR_SIZE];
+		read_sector(drive, sector, sector_buffer);
+		for (uint32_t i = 0; i < boot_sector->sectors_per_cluster * boot_sector->bytes_per_sector / sizeof(DirectoryEntry); i++) {
+			memcpy(&dir_entry, sector_buffer + i * sizeof(DirectoryEntry), sizeof(DirectoryEntry));
+			putsc(dir_entry.filename, VGA_COLOR_LIGHT_MAGENTA);
+		}
+		cluster = read_fat_entry(drive, boot_sector, cluster);
+	}
 }

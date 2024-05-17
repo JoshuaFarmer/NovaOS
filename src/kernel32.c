@@ -2,13 +2,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-/* This tutorial will only work for the 32-bit ix86 targets. */
-#if !defined(__i386__)
-#error "This tutorial needs to be compiled with a ix86-elf compiler"
-#endif
-
 #include "kernel32.h"
-#include "video.h"
+// #include "video.h"
 
 void clsscr() {
 	for (size_t y = 0; y < VGA_HEIGHT; y++) {
@@ -39,23 +34,6 @@ struct multiboot_info {
 	// Other fields omitted for brevity
 };
 
-uint8_t hchar(uint8_t c) {
-	c&=15;
-	if (c <= 9) {
-		return c + '0';
-	} else if (c >= 0xA && c <= 0xF) {
-		return c + ('A'-10);
-	}
-	return 0;
-}
-
-void puth(uint8_t a) {
-	char c = hchar(a>>4);
-	putc(c);
-	c = hchar(a&15);
-	putc(c);
-}
-
 uint16_t* buffer;
 
 void system(const char* sys);
@@ -63,7 +41,6 @@ void system(const char* sys);
 char* system_user[128];
 void kernel_main(/*struct multiboot_info* mb_info*/)	{
 	init();
-	//init_graph_vga(400,256,1);
 	init_pit();
 	beep(650, 700);
 
@@ -74,9 +51,9 @@ void kernel_main(/*struct multiboot_info* mb_info*/)	{
 	//raw_disk_info disk = retrieve_disk_info();
 	identify_ata(0xA0); // main
 
-	FAT32BootSector* bootsec = read_boot_sector(0xA0);
+	FAT32BootSector bootsec = read_boot_sector(0xA0);
 
-	read_file(0xA0, bootsec, "a.txt");
+	read_file(0xA0, &bootsec, "a.txt");
 
 	char* kbdbuf[128];
 	memcpy(system_user, "Default", 128);
