@@ -4,6 +4,9 @@
 
 #include "kernel32.h"
 
+static inline void setcolor(const uint8_t color) { colour = color; }
+void system(const char* sys);
+
 // Setup VGA buffer. Initialize the VGA frame buffer. (I think - x4exr)
 void clsscr() {
 	for (size_t y = 0; y < VGA_HEIGHT; y++) {
@@ -22,15 +25,10 @@ void init(void) {
 	clsscr();
 }
 
-void setcolor(uint8_t color) {
-	colour = color;
-}
 
 uint16_t* buffer;
-
-void system(const char* sys);
-
 char* system_user[128];
+
 void kernel_main() {
 	init();
 	init_pit();
