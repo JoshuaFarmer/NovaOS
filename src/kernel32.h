@@ -1,7 +1,5 @@
 #pragma once
 #include <stdint.h>
-
-
 #include "typedef.h"
 
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg);
@@ -92,7 +90,6 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
 	return (uint16_t) uc | (uint16_t) color << 8;
 }
 
-// 27 == esc
 // 0xf1 - 0xfc are function keys
 // 0xfe is numlock
 // 0xfd is alt
@@ -100,59 +97,49 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
 char getch() {
 	char status;
 	do {
-		status = inb(KEYBOARD_STATUS_PORT); // Read keyboard status port
-	} while ((status & 0x01) == 0); // Wait until there is data to read
+		status = inb(KEYBOARD_STATUS_PORT);
+	} while ((status & 0x01) == 0);
 
-	unsigned char scancode = inb(KEYBOARD_DATA_PORT); // Read scan code
+	unsigned char scancode = inb(KEYBOARD_DATA_PORT);
 
 	static int shift_pressed = 0;
 
-	if (scancode == 0x2A) { // Scan code for Left Shift pressed
+	if (scancode == 0x2A) {
 		shift_pressed = 1;
-		return 0; // Ignore Shift key press itself
-	} else if (scancode == 0xAA) { // Scan code for Left Shift released
+		return 0;
+	} else if (scancode == 0xAA) {
 		shift_pressed = 0;
-		return 0; // Ignore Shift key release itself
+		return 0;
 	}
 
-	if (scancode & 0x80) {
-		return 0;
-	} else {
-		// Check if Shift key is pressed and adjust keyboard map index accordingly
-		if (shift_pressed) {
-			return keyboard_map_shifted[scancode];
-		} else {
-			return keyboard_map[scancode];
-		}
-	}
+	return (scancode & 0x80) ? 0 : (shift_pressed ? keyboard_map_shifted[scancode] : keyboard_map[scancode]);
 }
 
 void gets(char *buffer, const int buffer_size) {
 	int index = 0;
 	char c;
 
-	while (index < buffer_size - 1) { // Ensure space for null-terminator
+	while (index < buffer_size - 1) {
 		c = getch();
 
-		if (c == '\n') { // Check for Enter key
-			buffer[index] = '\0'; // Null-terminate the string
+		if (c == '\n') {
+			buffer[index] = '\0';
 			putc('\n');
 			return;
-		} else if (c == '\b') { // Check for backspace
-			if (index > 0) { // Ensure there are characters to delete
+		} else if (c == '\b') {
+			if (index > 0) {
 				index--;
-				putc('\b'); // Move cursor back
-				putc(' '); // Erase character
-				putc('\b'); // Move cursor back again
+				putc('\b');
+				putc(' ');
+				putc('\b');
 			}
-		} else if (c >= ' ' && c <= '~') { // Check if printable ASCII character
-			buffer[index++] = c; // Store printable character in buffer
-			putc(c); // Echo the character to the screen
+		} else if (c >= ' ' && c <= '~') {
+			buffer[index++] = c;
+			putc(c);
 		}
 	}
 
-	// If the loop exits, the buffer is full
-	buffer[index] = '\0'; // Null-terminate the string
+	buffer[index] = '\0';
 	putc('\n');
 }
 
@@ -170,7 +157,6 @@ void putch(const char c, const uint8_t colour, const size_t txtx, const size_t t
 	if (c == 0) return;
 	if (c == '\n') return;
 
-	// normal
 	((char*)videobuff)[(txty*80*2)+(txtx*2)] = c;
 	((char*)videobuff)[(txty*80*2)+(txtx*2)+1] = colour;
 	outb(0xe9, c);
@@ -179,7 +165,7 @@ void putch(const char c, const uint8_t colour, const size_t txtx, const size_t t
 void putc(const char c) {
 	if (txty < 0) txty = 0;
 	if (txtx < 0) txtx = 0;
-	// backspace
+
 	if (c == '\b') {--txtx;
 		if (txtx < 0) {
 			txtx = 0; --txty;
@@ -192,11 +178,9 @@ void putc(const char c) {
 		return;
 	}
 
-	// NULL
 	if (c == 0) return;
 	if (c == '\n') {txtx = 0; txty++; update_cursor(txtx, txty); return;}
 
-	// normal
 	((char*)videobuff)[(txty*80*2)+(txtx*2)] = c;
 	((char*)videobuff)[(txty*80*2)+(txtx*2)+1] = colour;
 	if (txtx <= 80) {
@@ -293,7 +277,7 @@ uint16_t* LBA28_read_sector(uint8_t drive, uint32_t LBA, uint32_t sector, uint16
 	outb(0x1F3, (uint8_t) LBA);
 	outb(0x1F4, (uint8_t)(LBA >> 8));
 	outb(0x1F5, (uint8_t)(LBA >> 16)); 
-	outb(0x1F7, 0x20); // 0x20 = 'Read' Command
+	outb(0x1F7, 0x20);
 
 	
 	uint16_t *tmp = addr;
@@ -314,13 +298,13 @@ void LBA28_write_sector(uint8_t drive, uint32_t LBA, uint32_t sector, uint16_t *
 	LBA &= 0x0FFFFFFF;
 	
 	wait_BSY();
-	outb(0x1F6, drive | ((LBA >> 24) & 0xF));		// send drive and bits 24 - 27 of LBA
-	outb(0x1F1, 0x00);								// ?
-	outb(0x1F2, sector);							// send number of sectors
-	outb(0x1F3, (uint8_t) LBA);						// send bits 0-7 of LBA
-	outb(0x1F4, (uint8_t) (LBA >> 8));				// 8-15
-	outb(0x1F5, (uint8_t) (LBA >> 16)); 			// 16-23
-	outb(0x1F7,0x30); 								// 0x30 = 'Write' Command
+	outb(0x1F6, drive | ((LBA >> 24) & 0xF));
+	outb(0x1F1, 0x00);
+	outb(0x1F2, sector);
+	outb(0x1F3, (uint8_t) LBA);
+	outb(0x1F4, (uint8_t) (LBA >> 8));
+	outb(0x1F5, (uint8_t) (LBA >> 16));
+	outb(0x1F7,0x30);
 
 	uint32_t *tmp = (uint32_t*)buffer;
 	
@@ -353,124 +337,9 @@ void decode_raw_disk_info(raw_disk_info dinfo, disk_info * result){
 
 FAT32BootSector read_boot_sector(uint8_t drive) {
 	FAT32BootSector boot_sector;
-	memset(&boot_sector, 0, sizeof(FAT32BootSector)); // Initialize struct with zeros
-	
-	LBA28_read_sector(drive, 1, 1, (uint16_t*)&boot_sector); // Corrected pointer cast
-	
+	memset(&boot_sector, 0, sizeof(FAT32BootSector));
+	LBA28_read_sector(drive, 1, 1, (uint16_t*)&boot_sector);
 	return boot_sector;
-}
-
-void free_boot_sector(FAT32BootSector* boot_sector) {
-	free(boot_sector);
-}
-
-// Read the FAT table entry for a given cluster
-uint32_t read_fat_entry(uint8_t drive, FAT32BootSector* boot_sector, uint32_t cluster) {
-	uint32_t fat_sector = boot_sector->reserved_sectors + (cluster * 4) / boot_sector->bytes_per_sector;
-	uint16_t* fat_buffer = (uint16_t*)malloc(SECTOR_SIZE);
-	read_sector(drive, fat_sector, fat_buffer);
-	uint32_t fat_offset = (cluster * 4) % boot_sector->bytes_per_sector;
-	uint32_t fat_entry = *((uint32_t*)(fat_buffer + fat_offset));
-	free(fat_buffer);
-	return fat_entry;
-}
-
-// Write to a FAT table entry
-void write_fat_entry(uint8_t drive, FAT32BootSector* boot_sector, uint32_t cluster, uint32_t value) {
-	uint32_t fat_sector = boot_sector->reserved_sectors + (cluster * 4) / boot_sector->bytes_per_sector;
-	uint16_t* fat_buffer = (uint16_t*)malloc(SECTOR_SIZE);
-	read_sector(drive, fat_sector, fat_buffer);
-	uint32_t fat_offset = (cluster * 4) % boot_sector->bytes_per_sector;
-	*((uint32_t*)(fat_buffer + fat_offset)) = value;
-	write_sector(drive, fat_sector, fat_buffer);
-	free(fat_buffer);
-}
-
-void read_file(uint8_t drive, FAT32BootSector* boot_sector, const char* filepath) {
-	uint32_t cluster = boot_sector->root_cluster;
-	DirectoryEntry dir_entry;
-
-	// Tokenize the filepath to extract directory names
-	char* token = strtok((char*)filepath, "/");
-	while (token != NULL) {
-		// Traverse the directory tree to find the directory
-		while (cluster < 0x0FFFFFF8) {
-			uint32_t sector = boot_sector->reserved_sectors + boot_sector->fat_count * boot_sector->sectors_per_fat + (cluster - 2) * boot_sector->sectors_per_cluster;
-			uint16_t sector_buffer[SECTOR_SIZE];
-			read_sector(drive, sector, sector_buffer);
-			for (uint32_t i = 0; i < boot_sector->sectors_per_cluster * boot_sector->bytes_per_sector / sizeof(DirectoryEntry); i++) {
-				memcpy(&dir_entry, sector_buffer + i * sizeof(DirectoryEntry), sizeof(DirectoryEntry));
-				if (memcmp(token, dir_entry.filename, strlen(token)) == 0) {
-					// Directory found, update the cluster and break out of the loop
-					cluster = (dir_entry.first_cluster_high << 16) | dir_entry.first_cluster_low;
-					break;
-				}
-			}
-			cluster = read_fat_entry(drive, boot_sector, cluster);
-		}
-		token = strtok(NULL, "/");
-	}
-
-	// At this point, cluster should point to the directory containing the target file
-	// Now, search for the file within this directory
-	while (cluster < 0x0FFFFFF8) {
-		uint32_t sector = boot_sector->reserved_sectors + boot_sector->fat_count * boot_sector->sectors_per_fat + (cluster - 2) * boot_sector->sectors_per_cluster;
-		uint16_t sector_buffer[SECTOR_SIZE];
-		read_sector(drive, sector, sector_buffer);
-		for (uint32_t i = 0; i < boot_sector->sectors_per_cluster * boot_sector->bytes_per_sector / sizeof(DirectoryEntry); i++) {
-			memcpy(&dir_entry, sector_buffer + i * sizeof(DirectoryEntry), sizeof(DirectoryEntry));
-			if (memcmp(filepath, dir_entry.filename, strlen(filepath)) == 0) {
-				// File found
-				uint32_t file_cluster = (dir_entry.first_cluster_high << 16) | dir_entry.first_cluster_low;
-				uint8_t* file_data = (uint8_t*)malloc(dir_entry.file_size);
-				if (file_data == NULL) {
-					putsc("Memory allocation error\n", VGA_COLOR_LIGHT_RED);
-					return;
-				}
-				memset(file_data, 0, dir_entry.file_size);
-				uint8_t* file_data_start = file_data; // Store the base address
-				while (file_cluster < 0x0FFFFFF8) {
-					uint32_t sector = boot_sector->reserved_sectors + boot_sector->fat_count * boot_sector->sectors_per_fat +
-									  (file_cluster - 2) * boot_sector->sectors_per_cluster;
-					read_sector(drive, sector, (uint16_t*)file_data);
-					file_data += boot_sector->sectors_per_cluster * boot_sector->bytes_per_sector;
-					file_cluster = read_fat_entry(drive, boot_sector, file_cluster);
-				}
-				// Print or process the file data as needed
-				// Here, we'll just print the first few bytes
-				for (uint32_t j = 0; j < 100 && j < dir_entry.file_size; j++) {
-					putc(file_data_start[j]);
-				}
-				free(file_data_start); // Free the original pointer
-				return;
-			}
-		}
-		cluster = read_fat_entry(drive, boot_sector, cluster);
-	}
-	putsc("File not found: ", VGA_COLOR_LIGHT_RED);
-	puts(filepath);
-	putc('\n');
-}
-
-void list_files(uint8_t drive, FAT32BootSector* boot_sector) {
-	uint32_t cluster = boot_sector->root_cluster;
-	puth(cluster>>24);
-	puth(cluster>>16);
-	puth(cluster>>8);
-	puth(cluster);
-	DirectoryEntry dir_entry;
-	puts("\nlisting\n");
-	// Traverse the directory tree to find the directory
-	while (cluster < 0x0FFFFFF8) {
-		uint32_t sector = boot_sector->reserved_sectors + boot_sector->fat_count * boot_sector->sectors_per_fat + (cluster - 2) * boot_sector->sectors_per_cluster;
-		uint16_t sector_buffer[SECTOR_SIZE];
-		read_sector(drive, sector, sector_buffer);
-		for (uint32_t i = 0; i < boot_sector->sectors_per_cluster * boot_sector->bytes_per_sector / sizeof(DirectoryEntry); i++) {
-			memcpy(&dir_entry, sector_buffer + i * sizeof(DirectoryEntry), sizeof(DirectoryEntry));
-			putsc(dir_entry.filename, VGA_COLOR_LIGHT_MAGENTA);
-		}
-		cluster = read_fat_entry(drive, boot_sector, cluster);
-	}
 }
 
 #include "io.h"

@@ -31,16 +31,14 @@ uint16_t* buffer;
 void system(const char* sys);
 
 char* system_user[128];
-void kernel_main()	{
+void kernel_main() {
 	init();
 	init_pit();
-	beep(650, 700);
+	beep(650, 500);
 
 	identify_ata(0xA0); // master drive
 
 	FAT32BootSector bootsec = read_boot_sector(0xA0);
-
-	read_file(0xA0, &bootsec, "a.txt");
 
 	char* kbdbuf[128];
 	memcpy(system_user, "Default", 128);
