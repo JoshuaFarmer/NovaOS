@@ -1,5 +1,2 @@
-# ignore ALL .log files
-*.log
-isodir/
-src/video.h
-bin/
+./isodir/
+./bin/
