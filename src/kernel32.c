@@ -4,7 +4,7 @@
 
 #include "kernel32.h"
 
-static inline void setcolor(const uint8_t color) { colour = color; }
+#define setcolor(color) { colour = color }
 void system(const char* sys);
 
 // Setup VGA buffer. Initialize the VGA frame buffer. (I think - x4exr)
@@ -29,14 +29,13 @@ void init(void) {
 uint16_t* buffer;
 char* system_user[128];
 
+#include "fat.h"
 void kernel_main() {
 	init();
 	init_pit();
 	beep(650, 500);
 
 	identify_ata(0xA0); // master drive
-
-	FAT32BootSector bootsec = read_boot_sector(0xA0);
 
 	char* kbdbuf[128];
 	memcpy(system_user, "Default", 128);

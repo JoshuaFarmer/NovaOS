@@ -335,13 +335,6 @@ void decode_raw_disk_info(raw_disk_info dinfo, disk_info * result){
 	result -> drives = dinfo.dl;
 }
 
-FAT32BootSector read_boot_sector(uint8_t drive) {
-	FAT32BootSector boot_sector;
-	memset(&boot_sector, 0, sizeof(FAT32BootSector));
-	LBA28_read_sector(drive, 1, 1, (uint16_t*)&boot_sector);
-	return boot_sector;
-}
-
 #include "io.h"
 #include "memory.h"
 #include "badmalloc.h"
