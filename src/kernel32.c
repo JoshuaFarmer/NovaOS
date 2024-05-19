@@ -4,6 +4,8 @@
 
 #include "kernel32.h"
 
+#include <stdint.h>
+
 #define setcolor(color) { colour = color }
 void system(const char* sys);
 
@@ -24,7 +26,6 @@ void init(void) {
 	txtbuff = (uint16_t*) 0xB8000;
 	clsscr();
 }
-
 
 uint16_t* buffer;
 char* system_user[128];
@@ -93,7 +94,7 @@ void system(const char* sys) {
 		txtx = 0;
 		txty = 0;
 	}
-	
+
 	else if (strcmp(cmd[0], "") == 0) {}
 	else {
 		puts("COMMAND: "); puts(cmd[0]); putc('\n');
