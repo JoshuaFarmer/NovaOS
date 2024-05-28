@@ -31,6 +31,7 @@ uint16_t* buffer;
 char* system_user[128];
 
 #include "fat.h"
+#include "emu.h"
 void kernel_main() {
 	init();
 	init_pit();
@@ -93,6 +94,10 @@ void system(const char* sys) {
 		clsscr();
 		txtx = 0;
 		txty = 0;
+	}
+
+	else if (strcmp(cmd[0], "asm") == 0) {
+		putsc("soon.\n", VGA_COLOR_LIGHT_RED);
 	}
 
 	else if (strcmp(cmd[0], "") == 0) {}
