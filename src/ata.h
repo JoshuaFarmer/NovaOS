@@ -1,4 +1,7 @@
 #pragma once
+#include "typedef.h"
+#include "terminal.h"
+#include "io.h"
 
 void identify_ata(uint8_t drive){
 	outb(0x1F6, drive);
