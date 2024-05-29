@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdint.h>
 #define ram_size 4096
 #define Z S[0]

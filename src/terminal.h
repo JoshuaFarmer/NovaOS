@@ -1,3 +1,4 @@
+#pragma once
 void putc(const uint16_t c);
 
 static const size_t VGA_WIDTH = 80;
