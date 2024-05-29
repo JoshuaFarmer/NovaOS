@@ -30,15 +30,13 @@ void init(void) {
 uint16_t* buffer;
 char* system_user[128];
 
-#include "fat.h"
-#include "emu.h"
 void kernel_main() {
 	init();
+	init_heap();
 	init_pit();
 	beep(650, 500);
 
 	identify_ata(0xA0); // master drive
-
 	uint16_t kbdbuf[128];
 	memcpy(system_user, "Default", 128);
 

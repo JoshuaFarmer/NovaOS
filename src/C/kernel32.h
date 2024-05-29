@@ -9,3 +9,5 @@
 #include "badmalloc.h"
 #include "sound.h"
 #include "ata.h"
+#include "fat.h"
+#include "emu.h"
