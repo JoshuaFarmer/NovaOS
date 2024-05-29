@@ -15,9 +15,21 @@ bool numlock=false;
 enum {
 	KEY_NULL = 0x0,
 	KEY_CTRL = 0xF001,
-	KEY_ALT = 0xF002,
-	KEY_TAB = 0xF003,
-	KEY_NUML = 0xF004,
+	KEY_ALT,
+	KEY_TAB,
+	KEY_NUML,
+	KEY_ESC,
+	KEY_INS,
+	KEY_HOM,
+	KEY_PGU,
+	KEY_DEL,
+	KEY_END,
+	KEY_PGD,
+	KEY_UP,
+	KEY_DN,
+	KEY_LE,
+	KEY_RI,
+	KEY_SCRL, // scroll lock
 
 	KEY_F1 = 0xF010,
 	KEY_F2,
@@ -34,17 +46,27 @@ enum {
 };
 
 const uint16_t keyboard_map[256] = {
-	KEY_NULL, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', KEY_TAB,
+	KEY_NULL, KEY_ESC, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', KEY_TAB,
 	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', KEY_CTRL, 'a', 's',
 	'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', KEY_NULL, '#', 'z', 'x', 'c', 'v',
 	'b', 'n', 'm', ',', '.', '/', KEY_ALT, '*', KEY_ALT, ' ',
-	KEY_CTRL, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_NUML, '/', '7',
+	KEY_CTRL, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_NUML, KEY_SCRL, KEY_HOM,
+	KEY_UP, KEY_PGU, '-', KEY_LE, '5', KEY_RI, '+', KEY_END, KEY_DN, KEY_PGD, KEY_INS, KEY_DEL, '\n',
+	KEY_ALT, '\\', KEY_F11, KEY_F12
+};
+
+const uint16_t keyboard_map_numlock[256] = {
+	KEY_NULL, KEY_ESC, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', KEY_TAB,
+	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', KEY_CTRL, 'a', 's',
+	'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', KEY_NULL, '#', 'z', 'x', 'c', 'v',
+	'b', 'n', 'm', ',', '.', '/', KEY_ALT, '*', KEY_ALT, ' ',
+	KEY_CTRL, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_NUML, KEY_SCRL, '7',
 	'8', '9', '-', '4', '5', '6', '+', '1', '2', '3', '0', '.', '\n',
 	KEY_ALT, '\\', KEY_F11, KEY_F12
 };
 
 const uint16_t keyboard_map_shifted[256] = {
-	KEY_NULL, 27, '!', '"', '\\', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b', KEY_TAB,
+	KEY_NULL, KEY_ESC, '!', '"', '\\', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b', KEY_TAB,
 	'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', KEY_CTRL, 'A', 'S',
 	'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '@', '`', KEY_NULL, '#', 'Z', 'X', 'C', 'V',
 	'B', 'N', 'M', '<', '>', '?', KEY_ALT, '*', KEY_ALT, ' ',
@@ -77,9 +99,9 @@ uint16_t getch() {
 	} else if (scancode == 0xAA) {
 		shift_pressed = 0;
 		return 0;
-	}
-
-	return (scancode & 0x80) ? 0 : (shift_pressed ? keyboard_map_shifted[scancode] : keyboard_map[scancode]);
+	} else if (keyboard_map[scancode] == KEY_NUML) numlock = !numlock;
+	
+	return (scancode & 0x80) ? 0 : (numlock ? (shift_pressed ? keyboard_map_shifted[scancode] : keyboard_map[scancode]) : keyboard_map_numlock[scancode]);
 }
 
 void gets(uint16_t *buffer, const size_t buffer_size) {
@@ -123,7 +145,7 @@ void putch(const uint16_t c, const uint8_t colour, const size_t txtx, const size
 	if (c == '\b') return;
 	if (c == 0) return;
 	if (c == '\n') return;
-	if (c == 0xF003) {for (size_t i = 0; i < tabw; ++i) putch(' ', colour, txtx, txty); return;}
+	if (c == KEY_TAB) {for (size_t i = 0; i < tabw; ++i) putch(' ', colour, txtx, txty); return;}
 
 	((char*)videobuff)[(txty*80*2)+(txtx*2)] = c;
 	((char*)videobuff)[(txty*80*2)+(txtx*2)+1] = colour;
@@ -148,7 +170,7 @@ void putc(const uint16_t c) {
 
 	if (c == 0) return;
 	if (c == '\n') {txtx = 0; txty++; update_cursor(txtx, txty); return;}
-	if (c == 0xF003) {for (size_t i = 0; i < tabw; ++i) putc(' '); return;}
+	if (c == KEY_TAB) {for (size_t i = 0; i < tabw; ++i) putc(' '); return;}
 
 	((char*)videobuff)[(txty*80*2)+(txtx*2)] = c;
 	((char*)videobuff)[(txty*80*2)+(txtx*2)+1] = colour;

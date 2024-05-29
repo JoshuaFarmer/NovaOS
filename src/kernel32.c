@@ -113,6 +113,11 @@ void system(const uint16_t* sys) {
 }
 
 void text_editor() {
+	clsscr();
+	txtx = 0;
+	txty = 0;
+	update_cursor(txtx,txty);
+
 	uint16_t c = 0;
 	bool running = true;
 
