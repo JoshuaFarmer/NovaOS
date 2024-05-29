@@ -1,5 +1,3 @@
 isodir/
 bin/
-.vscode/settings.json
-bin/Nova.iso
-bin/Nova.qcow2
+.vscode/
