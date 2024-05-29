@@ -7,7 +7,7 @@
 #include <stdint.h>
 
 #define setcolor(color) { colour = color }
-void system(const char* sys);
+void system(const uint16_t* sys);
 
 // Setup VGA buffer. Initialize the VGA frame buffer. (I think - x4exr)
 void clsscr() {
@@ -39,7 +39,7 @@ void kernel_main() {
 
 	identify_ata(0xA0); // master drive
 
-	char* kbdbuf[128];
+	uint16_t kbdbuf[128];
 	memcpy(system_user, "Default", 128);
 
 	for (;;) {
@@ -47,13 +47,15 @@ void kernel_main() {
 		putcc(':',VGA_COLOR_LIGHT_GREY);
 		putcc('/', VGA_COLOR_LIGHT_BLUE);
 		putsc("$ ", VGA_COLOR_LIGHT_GREY);
-		gets((char*)kbdbuf, 128);
+		gets((uint16_t*)kbdbuf, 128);
 
-		system((const char*)kbdbuf);
+		system((const uint16_t*)kbdbuf);
 	}
 }
 
-void system(const char* sys) {
+void text_editor();
+
+void system(const uint16_t* sys) {
 	char cmd[10][128];
 
 	for (int h = 0; h < 10; h++) {
@@ -66,7 +68,7 @@ void system(const char* sys) {
 
 	while (sys[i] != '\0') {
 		while (sys[i] == ' ')
-			i++;
+			i+=1;
 
 		if (sys[i] == '\0')
 			break;
@@ -75,7 +77,7 @@ void system(const char* sys) {
 			cmd[c][j++] = sys[i++];
 		}
 		cmd[c][j] = '\0';
-		c++;
+		++c;
 		j = 0;
 	}
 
@@ -96,16 +98,31 @@ void system(const char* sys) {
 		txty = 0;
 	}
 
-	else if (strcmp(cmd[0], "asm") == 0) {
-		putsc("soon.\n", VGA_COLOR_LIGHT_RED);
+	else if (strcmp(cmd[0], "edit") == 0) {
+		text_editor();
 	}
 
 	else if (strcmp(cmd[0], "") == 0) {}
 	else {
 		puts("COMMAND: "); puts(cmd[0]); putc('\n');
 		puts("ARG(S): "); putc('\n');
-		for (int k = 1; k < c; ++k) {
+		for (int k = 1; k < c; ++k) {;
 			puts(cmd[k]); putc('\n');
+		}
+	}
+}
+
+void text_editor() {
+	uint16_t c = 0;
+	bool running = true;
+
+	while (running) {
+		c = getch();
+		if (c == 0xF001) {
+			c = getch();
+			if (c == 'c') return;
+		} else {
+			putc(c);
 		}
 	}
 }

@@ -3,6 +3,8 @@
 #include "io.h"
 #include "typedef.h"
 
+void wait_ms(unsigned int milliseconds);
+
 static void playSound(uint32_t nFrequence) {
 	uint32_t Div;
 	uint8_t tmp;
