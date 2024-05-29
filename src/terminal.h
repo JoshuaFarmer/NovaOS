@@ -11,24 +11,45 @@ size_t txtx=0;
 size_t tabw = 4;
 bool numlock=false;
 
+enum {
+	KEY_NULL = 0x0,
+	KEY_CTRL = 0xF001,
+	KEY_ALT = 0xF002,
+	KEY_TAB = 0xF003,
+	KEY_NUML = 0xF004,
+
+	KEY_F1 = 0xF010,
+	KEY_F2,
+	KEY_F3,
+	KEY_F4,
+	KEY_F5,
+	KEY_F6,
+	KEY_F7,
+	KEY_F8,
+	KEY_F9,
+	KEY_F10,
+	KEY_F11,
+	KEY_F12,
+};
+
 const uint16_t keyboard_map[256] = {
-	0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', 0xF003,
-	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 0xF001, 'a', 's',
-	'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0, '#', 'z', 'x', 'c', 'v',
-	'b', 'n', 'm', ',', '.', '/', 0xF002, '*', 0xF002, ' ',
-	0xF001, 0xF010, 0xF011, 0xF012, 0xF013, 0xF014, 0xF015, 0xF016, 0xF017, 0xF018, 0xF019, 0xF004, '/', '7',
+	KEY_NULL, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b', KEY_TAB,
+	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', KEY_CTRL, 'a', 's',
+	'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', KEY_NULL, '#', 'z', 'x', 'c', 'v',
+	'b', 'n', 'm', ',', '.', '/', KEY_ALT, '*', KEY_ALT, ' ',
+	KEY_CTRL, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_NUML, '/', '7',
 	'8', '9', '-', '4', '5', '6', '+', '1', '2', '3', '0', '.', '\n',
-	0xF002, '\\', 0xF0, 0xF0
+	KEY_ALT, '\\', KEY_F11, KEY_F12
 };
 
 const uint16_t keyboard_map_shifted[256] = {
-	0, 27, '!', '"', '\\', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b', '\t',
-	'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', 'C', 'A', 'S',
-	'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '@', '`', 0, '#', 'Z', 'X', 'C', 'V',
-	'B', 'N', 'M', '<', '>', '?', 0xF002, '*', 0xF002, ' ',
-	0xF001, 0xF010, 0xF011, 0xF012, 0xF013, 0xF014, 0xF015, 0xF016, 0xF017, 0xF018, 0xF019, 0xF004, '/', '7',
+	KEY_NULL, 27, '!', '"', '\\', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b', KEY_TAB,
+	'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', KEY_CTRL, 'A', 'S',
+	'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '@', '`', KEY_NULL, '#', 'Z', 'X', 'C', 'V',
+	'B', 'N', 'M', '<', '>', '?', KEY_ALT, '*', KEY_ALT, ' ',
+	KEY_CTRL, KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_NUML, '/', '7',
 	'8', '9', '-', '4', '5', '6', '+', '1', '2', '3', '0', '.', '\n',
-	0xF002, '\\', 0xF0, 0xF0
+	KEY_ALT, '\\', KEY_F11, KEY_F12
 };
 
 static inline uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
