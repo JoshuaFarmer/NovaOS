@@ -43,10 +43,10 @@ void kernel_main() {
 	memcpy(system_user, "Default", 128);
 
 	for (;;) {
-		putsc((const char*)system_user, VGA_COLOR_LIGHT_BROWN);
-		putcc(':',VGA_COLOR_LIGHT_GREY);
-		putcc('/', VGA_COLOR_LIGHT_BLUE);
-		putsc("$ ", VGA_COLOR_LIGHT_GREY);
+		puts_coloured((const char*)system_user, VGA_COLOR_LIGHT_BROWN);
+		putc_coloured(':',VGA_COLOR_LIGHT_GREY);
+		putc_coloured('/', VGA_COLOR_LIGHT_BLUE);
+		puts_coloured("$ ", VGA_COLOR_LIGHT_GREY);
 		gets((uint16_t*)kbdbuf, 128);
 
 		system((const uint16_t*)kbdbuf);

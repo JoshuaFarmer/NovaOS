@@ -14,10 +14,10 @@ void identify_ata(uint8_t drive){
 	if(tmp & STATUS_RDY){
 		switch(drive){
 			case 0xA0:
-				putsc("Master Drive is the current active Drive\n", VGA_COLOR_LIGHT_GREEN);
+				puts_coloured("Master Drive is the current active Drive\n", VGA_COLOR_LIGHT_GREEN);
 				break;
 			case 0xB0:
-				putsc("Slave Drive is the current active Drive\n", VGA_COLOR_LIGHT_GREEN);
+				puts_coloured("Slave Drive is the current active Drive\n", VGA_COLOR_LIGHT_GREEN);
 				break;
 		}
 	}
@@ -25,10 +25,10 @@ void identify_ata(uint8_t drive){
 	{
 		switch(drive){
 			case 0xA0:
-				putsc("Master Drive is NOT the current active Drive \n", VGA_COLOR_LIGHT_RED);
+				puts_coloured("Master Drive is NOT the current active Drive \n", VGA_COLOR_LIGHT_RED);
 				break;
 			case 0xB0:
-				putsc("Slave Drive is NOT the current active Drive \n", VGA_COLOR_LIGHT_RED);
+				puts_coloured("Slave Drive is NOT the current active Drive \n", VGA_COLOR_LIGHT_RED);
 				break;
 			}
 	}
