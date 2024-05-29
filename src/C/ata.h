@@ -3,7 +3,7 @@
 #include "terminal.h"
 #include "io.h"
 
-void identify_ata(uint8_t drive){
+void identify_ata(uint8_t drive) {
 	outb(0x1F6, drive);
 	outb(0x1F2, 0);
 	outb(0x1F3, 0);
@@ -11,8 +11,8 @@ void identify_ata(uint8_t drive){
 	outb(0x1F5, 0);
 	outb(0x1F7, 0xEC);
 	uint8_t tmp = inb(0x1F7);
-	if(tmp & STATUS_RDY){
-		switch(drive){
+	if (tmp & STATUS_RDY) {
+		switch (drive) {
 			case 0xA0:
 				puts_coloured("Master Drive is the current active Drive\n", VGA_COLOR_LIGHT_GREEN);
 				break;
@@ -23,7 +23,7 @@ void identify_ata(uint8_t drive){
 	}
 	else
 	{
-		switch(drive){
+		switch (drive) {
 			case 0xA0:
 				puts_coloured("Master Drive is NOT the current active Drive \n", VGA_COLOR_LIGHT_RED);
 				break;
@@ -51,10 +51,10 @@ uint16_t* LBA28_read_sector(uint8_t drive, uint32_t LBA, uint32_t sector, uint16
 
 	uint16_t *tmp = addr;
 	
-	for (uint32_t j = 0; j < sector; j ++){
+	for (uint32_t j = 0; j < sector; j ++) {
 		wait_BSY();
 		wait_DRQ();
-		for(uint32_t i = 0; i < 256; i++){
+		for (uint32_t i = 0; i < 256; i++) {
 			tmp[i] = inw(0x1F0);
 		}
 
@@ -63,7 +63,7 @@ uint16_t* LBA28_read_sector(uint8_t drive, uint32_t LBA, uint32_t sector, uint16
 	return addr;
 }
 
-void LBA28_write_sector(uint8_t drive, uint32_t LBA, uint32_t sector, uint16_t *buffer){
+void LBA28_write_sector(uint8_t drive, uint32_t LBA, uint32_t sector, uint16_t *buffer) {
 	LBA &= 0x0FFFFFFF;
 	
 	wait_BSY();
@@ -77,11 +77,11 @@ void LBA28_write_sector(uint8_t drive, uint32_t LBA, uint32_t sector, uint16_t *
 
 	uint32_t *tmp = (uint32_t*)buffer;
 	
-	for (uint32_t j = 0; j < sector; j++){
+	for (uint32_t j = 0; j < sector; j++) {
 		wait_BSY();
 		wait_DRQ();
 
-		for(uint32_t i = 0; i < 256; i++){
+		for (uint32_t i = 0; i < 256; i++) {
 			outl(0x1F0, tmp[i]);
 		}
 
@@ -91,12 +91,12 @@ void LBA28_write_sector(uint8_t drive, uint32_t LBA, uint32_t sector, uint16_t *
 	}
 }
 
-raw_disk_info retrieve_disk_info(){
+raw_disk_info retrieve_disk_info() {
 	raw_disk_info* dinfo = (raw_disk_info*)0x5200;
 	return *dinfo;
 }
 
-void decode_raw_disk_info(raw_disk_info dinfo, disk_info * result){
+void decode_raw_disk_info(raw_disk_info dinfo, disk_info * result) {
 	result -> drivetype = dinfo.bl;
 	result -> sectors = dinfo.cl & 0b00111111;
 	result -> cylinders = ((dinfo.cl & 0b11000000) << 2) | dinfo.ch;
