@@ -18,6 +18,18 @@ int strcmp(const char *s1, const char *s2) {
 	return *(const unsigned char *)s1 - *(const unsigned char *)s2;
 }
 
+int strncmp(const char *s1, const char *s2, size_t n) {
+	while (n) {
+		if (*s1 != *s2 || *s1 == '\0' || *s2 == '\0') {
+			return *(unsigned char *)s1 - *(unsigned char *)s2;
+		}
+		s1++;
+		s2++;
+		n--;
+	}
+	return 0;
+}
+
 char* strpbrk(const char* s, const char* accept) {
 	if (s == NULL || accept == NULL)
 		return NULL;
