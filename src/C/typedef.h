@@ -3,12 +3,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-typedef struct block {
-	size_t size;
-	struct block* next;
-	int free;
-} block_t;
-
 enum vga_color {
 	VGA_COLOR_BLACK = 0,
 	VGA_COLOR_BLUE = 1,

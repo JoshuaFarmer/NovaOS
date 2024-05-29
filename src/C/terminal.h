@@ -237,3 +237,28 @@ void puts_word(const uint16_t* data) {
 	while (data[i++] != 0x0000)
 		putc(data[i]);
 }
+
+void print_int(int num, uint8_t colour) {
+	if (num == 0) {
+		putc_coloured('0',colour);
+		return;
+	}
+
+	if (num < 0) {
+		putc_coloured('-',colour);
+		num = -num;
+	}
+
+	char buffer[10];  // Buffer to hold the digits
+	int i = 0;
+
+	while (num > 0) {
+		buffer[i++] = (num % 10) + '0';  // Convert digit to character
+		num /= 10;
+	}
+
+	// Print the digits in reverse order
+	while (--i >= 0) {
+		putc_coloured(buffer[i],colour);
+	}
+}

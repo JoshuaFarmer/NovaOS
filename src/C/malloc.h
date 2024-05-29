@@ -2,15 +2,14 @@
 #include <stdint.h>
 #include "memory.h"
 
-// 720kb should be enough.
-#define HEAP_CAP 720000
+#define HEAP_CAP 250000
 
 void puts_coloured(const char* data, const uint8_t col);
 
 typedef struct HEAP {
 	uint8_t  raw[HEAP_CAP];
-	bool is_free[HEAP_CAP];
-	uint32_t len[HEAP_CAP];
+	uint8_t  is_free[HEAP_CAP];
+	uint16_t len[HEAP_CAP];
 } Heap_t;
 
 Heap_t heap;
@@ -51,4 +50,14 @@ void free(void* ptr) {
 		}
 	}
 	puts_coloured("FREE - NOT FOUND IN THE HEAP\n", VGA_COLOR_LIGHT_RED);
+}
+
+size_t remaining_heap_space() {
+	size_t remain=0;
+	for (int i = 0; i < HEAP_CAP; ++i) {
+		if (heap.is_free[i] == true) {
+			++remain;
+		}
+	}
+	return remain;
 }

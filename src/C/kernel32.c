@@ -27,8 +27,8 @@ void init(void) {
 	clsscr();
 }
 
-uint16_t* buffer;
-char* system_user[128];
+uint8_t* system_user;
+bool running = true;
 
 void kernel_main() {
 	init();
@@ -37,10 +37,16 @@ void kernel_main() {
 	beep(650, 500);
 
 	identify_ata(0xA0); // master drive
-	uint16_t kbdbuf[128];
-	memcpy(system_user, "Default", 128);
+	uint16_t* kbdbuf = malloc(128 * sizeof(uint16_t));
+	system_user = malloc(32);
 
-	for (;;) {
+	memcpy(system_user, "Default", 128);
+	
+	size_t heap_size = remaining_heap_space();
+	print_int(heap_size,VGA_COLOR_LIGHT_GREEN);
+	puts_coloured(" Bytes left in the Heap\n", VGA_COLOR_LIGHT_GREEN);
+
+	while (running) {
 		puts_coloured((const char*)system_user, VGA_COLOR_LIGHT_BROWN);
 		putc_coloured(':',VGA_COLOR_LIGHT_GREY);
 		putc_coloured('/', VGA_COLOR_LIGHT_BLUE);
@@ -49,6 +55,10 @@ void kernel_main() {
 
 		system((const uint16_t*)kbdbuf);
 	}
+
+	free(kbdbuf);
+	free(system_user);
+	outw(0x604,0x2000); // qemu only iirc
 }
 
 void text_editor();
@@ -94,6 +104,10 @@ void system(const uint16_t* sys) {
 		clsscr();
 		txtx = 0;
 		txty = 0;
+	}
+
+	else if (strcmp(cmd[0], "exit") == 0) {
+		running = false;
 	}
 
 	else if (strcmp(cmd[0], "edit") == 0) {
