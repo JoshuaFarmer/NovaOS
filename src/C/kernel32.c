@@ -111,8 +111,7 @@ void system(const uint16_t* sys) {
 			 "\tuser set [name] | Set the current name of the user (default is 'Default')\n"
 			 "\tclear           | Clear the terminal\n"
 			 "\texit            | Shut down the system\n"
-			 "\tedit            | Make the terminal look like a text editor\n"
-			 "\tgetchar         | Wait until user inputs a character\n");
+			 "\tedit            | Make the terminal look like a text editor\n");
 	}
 
 	else if (strcmp(cmd[0], "clear") == 0) {
@@ -127,14 +126,6 @@ void system(const uint16_t* sys) {
 
 	else if (strcmp(cmd[0], "edit") == 0) {
 		text_editor();
-	}
-
-	else if (strcmp(cmd[0], "getchar") == 0) {
-		puts("Type a character... ");
-		getch(); // skip newline
-		char typed = getch();
-		putc(typed);
-		putc('\n'); // and newline, of course
 	}
 
 	else if (strcmp(cmd[0], "") == 0) {}
