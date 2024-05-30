@@ -73,3 +73,7 @@ char* strdup(const char* s) {
 	strcpy(dup, s); // Copy the contents of the original string into the new string
 	return dup;
 }
+
+int atoi(const char *str) {
+	return NULL;
+}
