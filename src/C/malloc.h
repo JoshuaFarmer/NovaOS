@@ -26,7 +26,7 @@ void* malloc(size_t size) {
 	// O(N) but fuck it
 	for (size_t i = 0; i < HEAP_CAP; ++i) {
 		if (heap.is_free[i] == true) {
-			// ????
+			// Todo: make this thing more efficient - Rama
 			for (size_t k = 0; k < size; ++k) {
 				if (k > HEAP_CAP) break;
 			}
