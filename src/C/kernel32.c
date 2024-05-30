@@ -47,7 +47,8 @@ void kernel_main() {
 	print_int(heap_size,VGA_COLOR_LIGHT_GREEN);
 	puts_coloured(" Bytes left in the Heap\n", VGA_COLOR_LIGHT_GREEN);
 
-	read_file(0xA0, "a.txt", system_user);
+	
+	read_file(0xA0, "A     TXT", system_user);
 	while (running) {
 		puts_coloured((const char*)system_user, VGA_COLOR_LIGHT_BROWN);
 		putc_coloured(':',VGA_COLOR_LIGHT_GREY);
