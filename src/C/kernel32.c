@@ -38,6 +38,7 @@ void kernel_main() {
 
 	identify_ata(0xA0); // master drive
 	uint16_t* kbdbuf = malloc(128 * sizeof(uint16_t));
+	// set the current user to "default"
 	system_user = malloc(32);
 
 	memcpy(system_user, "Default", 128);
@@ -46,13 +47,15 @@ void kernel_main() {
 	print_int(heap_size,VGA_COLOR_LIGHT_GREEN);
 	puts_coloured(" Bytes left in the Heap\n", VGA_COLOR_LIGHT_GREEN);
 
-	read_file(0xA0, "A       TXT", system_user);
+	read_file(0xA0, "a.txt", system_user);
 	while (running) {
 		puts_coloured((const char*)system_user, VGA_COLOR_LIGHT_BROWN);
 		putc_coloured(':',VGA_COLOR_LIGHT_GREY);
 		putc_coloured('/', VGA_COLOR_LIGHT_BLUE);
 		puts_coloured("$ ", VGA_COLOR_LIGHT_GREY);
 		gets((uint16_t*)kbdbuf, 128);
+
+
 
 		system((const uint16_t*)kbdbuf);
 	}
@@ -63,6 +66,7 @@ void kernel_main() {
 }
 
 void text_editor();
+void echo();
 
 void system(const uint16_t* sys) {
 	char cmd[10][128];
@@ -101,6 +105,16 @@ void system(const uint16_t* sys) {
 		}
 	}
 
+	// Every user needs a `help` command
+	else if (strcmp(cmd[0], "help") == 0) {
+		puts("COMMANDS:\n\n"
+			 "\tuser set [name] | Set the current name of the user (default is 'Default')\n"
+			 "\tclear           | Clear the terminal\n"
+			 "\texit            | Shut down the system\n"
+			 "\tedit            | Make the terminal look like a text editor\n"
+			 "\tgetchar         | Wait until user inputs a character\n");
+	}
+
 	else if (strcmp(cmd[0], "clear") == 0) {
 		clsscr();
 		txtx = 0;
@@ -113,6 +127,14 @@ void system(const uint16_t* sys) {
 
 	else if (strcmp(cmd[0], "edit") == 0) {
 		text_editor();
+	}
+
+	else if (strcmp(cmd[0], "getchar") == 0) {
+		puts("Type a character... ");
+		getch(); // skip newline
+		char typed = getch();
+		putc(typed);
+		putc('\n'); // and newline, of course
 	}
 
 	else if (strcmp(cmd[0], "") == 0) {}
