@@ -66,7 +66,6 @@ void kernel_main() {
 }
 
 void text_editor();
-void echo();
 
 void system(const uint16_t* sys) {
 	char cmd[10][128];
