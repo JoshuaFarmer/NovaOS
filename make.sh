@@ -32,7 +32,7 @@ if grub-file --is-x86-multiboot bin/Nova.bin; then
     dd if=bin/Nova.iso of=bin/Nova_512MB.img conv=notrunc
 
     # Optionally run the OS in QEMU
-    qemu-system-x86_64 -m 32m -soundhw pcspk -debugcon stdio -drive file=bin/Nova_512MB.img,format=raw
+    qemu-system-x86_64 -m 256m -soundhw pcspk -debugcon stdio -drive file=bin/Nova_512MB.img,format=raw
 else
     echo "The file is not multiboot"
 fi
