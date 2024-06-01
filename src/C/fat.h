@@ -163,12 +163,9 @@ typedef enum {
 	FAT12_c,
 	FAT16_c,
 	FAT32_c,
-	ExFAT_c,
 } FatType_t;
 
 FatType_t get_fat_type(fat_BS_t* fat_boot) {
-	if (fat_boot->bytes_per_sector == 0) { return ExFAT_c; }
-
 	const uint32_t total_clusters = get_total_clusters(fat_boot);
 	if (total_clusters < 4085) { return FAT12_c; }
 	if (total_clusters < 65525) { return FAT16_c; }
