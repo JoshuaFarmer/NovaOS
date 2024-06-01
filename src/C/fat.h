@@ -4,123 +4,173 @@
 
 #define FAT32_SIGNATURE 0xAA55
 
-// Define necessary data structures
-#pragma pack(push, 1)
+typedef struct fat_extBS_32
+{
+	//extended fat32 stuff
+	unsigned int		table_size_32;
+	unsigned short		extended_flags;
+	unsigned short		fat_version;
+	unsigned int		root_cluster;
+	unsigned short		fat_info;
+	unsigned short		backup_BS_sector;
+	unsigned char 		reserved_0[12];
+	unsigned char		drive_number;
+	unsigned char 		reserved_1;
+	unsigned char		boot_signature;
+	unsigned int 		volume_id;
+	unsigned char		volume_label[11];
+	unsigned char		fat_type_label[8];
+ 
+}__attribute__((packed)) fat_extBS_32_t;
+ 
+typedef struct fat_extBS_16
+{
+	//extended fat12 and fat16 stuff
+	unsigned char		bios_drive_num;
+	unsigned char		reserved1;
+	unsigned char		boot_signature;
+	unsigned int		volume_id;
+	unsigned char		volume_label[11];
+	unsigned char		fat_type_label[8];
+ 
+}__attribute__((packed)) fat_extBS_16_t;
+ 
+typedef struct fat_BS
+{
+	unsigned char 		bootjmp[3];
+	unsigned char 		oem_name[8];
+	unsigned short 			bytes_per_sector;
+	unsigned char		sectors_per_cluster;
+	unsigned short		reserved_sector_count;
+	unsigned char		table_count;
+	unsigned short		root_entry_count;
+	unsigned short		total_sectors_16;
+	unsigned char		media_type;
+	unsigned short		table_size_16;
+	unsigned short		sectors_per_track;
+	unsigned short		head_side_count;
+	unsigned int 		hidden_sector_count;
+	unsigned int 		total_sectors_32;
+ 
+	//this will be cast to it's specific type once the driver actually knows what type of FAT this is.
+	unsigned char		extended_section[54];
+ 
+}__attribute__((packed)) fat_BS_t;
 
-typedef struct {
-    uint8_t  jump[3];
-    uint8_t  oem[8];
-    uint16_t bytes_per_sector;
-    uint8_t  sectors_per_cluster;
-    uint16_t reserved_sectors;
-    uint8_t  fat_count;
-    uint16_t root_entry_count;
-    uint16_t total_sectors_16;
-    uint8_t  media_descriptor;
-    uint16_t sectors_per_fat_16;
-    uint16_t sectors_per_track;
-    uint16_t head_count;
-    uint32_t hidden_sectors;
-    uint32_t total_sectors_32;
-    uint32_t sectors_per_fat_32;
-    uint16_t flags;
-    uint16_t version;
-    uint32_t root_cluster;
-    uint16_t fsinfo_sector;
-    uint16_t backup_boot_sector;
-    uint8_t  reserved[12];
-    uint8_t  drive_number;
-    uint8_t  reserved_nt;
-    uint8_t  boot_signature;
-    uint32_t volume_id;
-    uint8_t  volume_label[11];
-    uint8_t  fs_type[8];
-    uint8_t  boot_code[420];
-    uint16_t boot_sector_signature;
-} fat32_boot_sector_t;
-
-typedef struct {
-    uint8_t  name[11];
-    uint8_t  attr;
-    uint8_t  nt_reserved;
-    uint8_t  time_tenth;
-    uint16_t create_time;
-    uint16_t create_date;
-    uint16_t access_date;
-    uint16_t cluster_high;
-    uint16_t write_time;
-    uint16_t write_date;
-    uint16_t cluster_low;
-    uint32_t size;
-} fat32_dir_entry_t;
-#pragma pack(pop)
-
-// Function to read the boot sector
-void read_boot_sector(uint8_t drive, fat32_boot_sector_t *bs) {
-    LBA28_read_sector(drive, 0, 1, (uint16_t*)bs);
+uint32_t get_total_sectors(fat_BS_t* fat_boot) {
+	int total_sectors = (fat_boot->total_sectors_16 == 0)? fat_boot->total_sectors_32 : fat_boot->total_sectors_16;
+	return total_sectors;
 }
 
-// Function to read a FAT entry
-uint32_t read_fat_entry(uint8_t drive, fat32_boot_sector_t *bs, uint32_t cluster) {
-    uint32_t fat_offset = cluster * 4;
-    uint32_t fat_sector = bs->reserved_sectors + (fat_offset / bs->bytes_per_sector);
-    uint32_t ent_offset = fat_offset % bs->bytes_per_sector;
-
-    uint16_t sector_data[256];
-    LBA28_read_sector(drive, fat_sector, 1, sector_data);
-
-    return (*(uint32_t*)((uint8_t*)sector_data + ent_offset)) & 0x0FFFFFFF;
+uint32_t get_fat_size(fat_BS_t* fat_boot) {
+	int fat_size = fat_boot->table_size_16;
+	return fat_size;
 }
 
-// Function to read a directory entry
-int read_dir_entry(uint8_t drive, fat32_boot_sector_t *bs, const char *filename, fat32_dir_entry_t *dir) {
-    uint32_t root_dir_sector = bs->reserved_sectors + bs->fat_count * bs->sectors_per_fat_32;
-    uint32_t dir_entries = bs->bytes_per_sector / sizeof(fat32_dir_entry_t);
-
-    fat32_dir_entry_t entries[dir_entries];
-
-    for (uint32_t i = 0; i < bs->sectors_per_cluster; i++) {
-        LBA28_read_sector(drive, root_dir_sector + i, 1, (uint16_t*)entries);
-        for (uint32_t j = 0; j < dir_entries; j++) {
-            if (strncmp((const char*)entries[j].name, filename, 11) == 0) {
-                *dir = entries[j];
-                return 1;
-            }
-        }
-    }
-    return 0;
+uint32_t get_root_dir_sectors(fat_BS_t* fat_boot) {
+	int root_dir_sectors = ((fat_boot->root_entry_count * 32) + (fat_boot->bytes_per_sector - 1)) / fat_boot->bytes_per_sector;
+	return root_dir_sectors;
 }
 
-// Function to read file data
-void read_file_data(uint8_t drive, fat32_boot_sector_t *bs, fat32_dir_entry_t *dir, uint8_t *buffer) {
-    uint32_t cluster = (dir->cluster_high << 16) | dir->cluster_low;
-    uint32_t bytes_per_cluster = bs->bytes_per_sector * bs->sectors_per_cluster;
-    uint32_t bytes_remaining = dir->size;
-
-    while (bytes_remaining > 0) {
-        uint32_t sector = bs->reserved_sectors + bs->fat_count * bs->sectors_per_fat_32 + (cluster - 2) * bs->sectors_per_cluster;
-        uint32_t sectors_to_read = bs->sectors_per_cluster;
-        if (sectors_to_read * bs->bytes_per_sector > bytes_remaining) {
-            sectors_to_read = (bytes_remaining + bs->bytes_per_sector - 1) / bs->bytes_per_sector;
-        }
-        LBA28_read_sector(drive, sector, sectors_to_read, (uint16_t*)buffer);
-        uint32_t bytes_to_copy = bytes_remaining < bytes_per_cluster ? bytes_remaining : bytes_per_cluster;
-        buffer += bytes_to_copy;
-        bytes_remaining -= bytes_to_copy;
-        cluster = read_fat_entry(drive, bs, cluster);
-    }
+uint32_t get_first_data_sector(fat_BS_t* fat_boot) {
+	int first_data_sector = fat_boot->reserved_sector_count + (fat_boot->table_count * get_fat_size(fat_boot) + get_root_dir_sectors(fat_boot));
+	return first_data_sector;
 }
 
-// Function to read a file by name
-void read_file(uint8_t drive, const char *filename, uint8_t *buffer) {
-    fat32_boot_sector_t bs;
-    fat32_dir_entry_t dir;
+uint32_t get_first_fat(fat_BS_t* fat_boot) {
+	int first_fat_sector = fat_boot->reserved_sector_count;
+	return first_fat_sector;
+}
 
-    read_boot_sector(drive, &bs);
+uint32_t get_total_data_sectors(fat_BS_t* fat_boot) {
+	int data_sectors = get_total_sectors(fat_boot) - (fat_boot->reserved_sector_count + (fat_boot->table_count * get_fat_size(fat_boot)) + get_root_dir_sectors(fat_boot));
+	return data_sectors;
+}
 
-    if (read_dir_entry(drive, &bs, filename, &dir)) {
-        read_file_data(drive, &bs, &dir, buffer);
-    } else {
-        puts_coloured("File not found\n", VGA_COLOR_LIGHT_RED);
-    }
+uint32_t get_total_clusters(fat_BS_t* fat_boot) {
+	int total_clusters = get_total_data_sectors(fat_boot) / fat_boot->sectors_per_cluster;
+	return total_clusters;
+}
+
+uint32_t get_first_root_dir_sector(fat_BS_t* fat_boot) {
+	int first_root_dir_sector = get_first_data_sector(fat_boot) - get_root_dir_sectors(fat_boot);
+	return first_root_dir_sector;
+}
+
+uint32_t get_first_root_dir_cluster32(fat_extBS_32_t* fat_boot) {
+	int root_cluster_32 = fat_boot->root_cluster;
+	return root_cluster_32;
+}
+
+uint32_t get_first_sector_of_cluster(fat_BS_t* fat_boot, uint32_t cluster) {
+	int first_sector_of_cluster = ((cluster - 2) * fat_boot->sectors_per_cluster) + get_first_data_sector(fat_boot);
+	return first_sector_of_cluster;
+}
+
+typedef struct fat_file_attr {
+	int read_only:1;
+	int hidden:1;
+	int system:1;
+	int vol:1;
+	int dir:1;
+	int archive:1;
+	int device:1;
+	int unused:1;
+}__attribute__ ((packed)) fat_file_attr_t;
+
+/* file date */
+typedef struct fat_file_date {
+	uint32_t day:5;
+	uint32_t month:4;
+	uint32_t year:7;
+}__attribute__ ((packed)) fat_file_date_t;
+
+/* file time */
+typedef struct fat_file_time {
+	uint32_t sec:5;
+	uint32_t min:6;
+	uint32_t hour:5;
+}__attribute__ ((packed)) fat_file_time_t;
+
+typedef struct fat_file {
+	uint8_t name[8];
+	uint8_t ext[3];
+	uint8_t attr;
+	uint8_t winnt_flags;
+	uint8_t creattimesecs;
+	uint16_t creattime;
+	uint16_t creatdate;
+	uint16_t lastacces;
+	uint16_t h_firstclus;
+	fat_file_time_t lm_time;
+	fat_file_date_t lm_date;
+	uint16_t l_firstclus;
+	uint32_t size;
+}__attribute__((packed)) fat_file_t;
+
+typedef struct fat_file_long {
+	uint8_t order;
+	uint16_t first_5[5];
+	uint8_t attr;
+	uint8_t long_entry_type;
+	uint8_t checksum;
+	uint8_t next_6[12];
+	uint16_t zeros;
+	uint8_t final_2[4];
+}__attribute__((packed)) fat_file_long_t;
+
+typedef enum {
+	FAT12_c,
+	FAT16_c,
+	FAT32_c,
+	ExFAT_c,
+} FatType_t;
+
+FatType_t get_fat_type(fat_BS_t* fat_boot) {
+	if (fat_boot->bytes_per_sector == 0) { return ExFAT_c; }
+
+	const uint32_t total_clusters = get_total_clusters(fat_boot);
+	if (total_clusters < 4085) { return FAT12_c; }
+	if (total_clusters < 65525) { return FAT16_c; }
+	else { return FAT32_c; }
 }

@@ -6,8 +6,15 @@
 
 #include <stdint.h>
 
+uint8_t* system_user;
+bool running = true;
+
 #define setcolor(color) { colour = color }
 void system(const uint16_t* sys);
+
+int abs(int value) {
+	return (value < 0) ? -value : value;
+}
 
 // Setup VGA buffer. Initialize the VGA frame buffer. (I think - x4exr)
 void clsscr() {
@@ -27,14 +34,15 @@ void init(void) {
 	clsscr();
 }
 
-uint8_t* system_user;
-bool running = true;
-
 void kernel_main() {
 	init();
 	init_heap();
 	init_pit();
 	beep(650, 500);
+
+	set_text_mode(1);
+	VGA_WIDTH = 90;
+	VGA_HEIGHT = 60;
 
 	identify_ata(0xA0); // master drive
 	uint16_t* kbdbuf = malloc(128 * sizeof(uint16_t));
@@ -46,7 +54,6 @@ void kernel_main() {
 	print_int(heap_size,VGA_COLOR_LIGHT_GREEN);
 	puts_coloured(" Bytes left in the Heap\n", VGA_COLOR_LIGHT_GREEN);
 
-	read_file(0xA0, "A       TXT", system_user);
 	while (running) {
 		puts_coloured((const char*)system_user, VGA_COLOR_LIGHT_BROWN);
 		putc_coloured(':',VGA_COLOR_LIGHT_GREY);
@@ -93,7 +100,7 @@ void system(const uint16_t* sys) {
 	if (strcmp(cmd[0], "user") == 0) {
 		if (c > 1) {
 			for (int k = 0; k < c; ++k) {
-				if (strcmp(cmd[k], "set") == 0 && k+1 != c) {
+				if (strcmp(cmd[k], "-s") == 0 && k+1 != c) {
 					memcpy(system_user, cmd[k+1], 128);
 					break;
 				}
@@ -107,12 +114,30 @@ void system(const uint16_t* sys) {
 		txty = 0;
 	}
 
+	else if (strcmp(cmd[0], "ls") == 0) {
+		// later.
+	}
+
 	else if (strcmp(cmd[0], "exit") == 0) {
 		running = false;
 	}
 
 	else if (strcmp(cmd[0], "edit") == 0) {
 		text_editor();
+	}
+
+	else if (strcmp(cmd[0], "txtmode") == 0) {
+		text_editor();
+		if (strcmp(cmd[1], "") == 0) {return;}
+		else if (strcmp(cmd[1], "-80x25") == 0) {
+			set_text_mode(0);
+			VGA_WIDTH = 80;
+			VGA_HEIGHT = 25;
+		} else if (strcmp(cmd[1], "-90x60") == 0) {
+			set_text_mode(1);
+			VGA_WIDTH = 90;
+			VGA_HEIGHT = 60;
+		}
 	}
 
 	else if (strcmp(cmd[0], "") == 0) {}
@@ -140,7 +165,9 @@ void text_editor() {
 			c = getch();
 			if (c == 'c') return;
 		} else {
-			putc(c);
+			if ((c >= ' ' && c <= '~') || c == KEY_TAB || c == '\n' || c == '\b') {
+				putc(c);
+			}
 		}
 	}
 }

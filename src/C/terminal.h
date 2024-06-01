@@ -1,9 +1,10 @@
 #pragma once
 #include "string.h"
 void putc(const uint16_t c);
+void scroll_terminal();
 
-static const size_t VGA_WIDTH = 80;
-static const size_t VGA_HEIGHT = 25;
+static size_t VGA_WIDTH = 80;
+static size_t VGA_HEIGHT = 25;
 
 uint8_t colour;
 uint16_t* txtbuff;
@@ -159,10 +160,10 @@ void putc_at(const uint16_t c, const uint8_t colour, size_t txtx, size_t txty) {
 	if (c == '\b') {--txtx;
 		if (txtx < 0) {
 			txtx = 0; --txty;
-			while ( ((char*)videobuff)[(txty*80*2) + (txtx*2)] != '\0') {txtx++;};
+			while ( ((char*)videobuff)[(txty*VGA_WIDTH*2) + (txtx*2)] != '\0') {txtx++;};
 		}
-		((char*)videobuff)[(txty*80*2)+(txtx*2)] = '\0';
-		((char*)videobuff)[(txty*80*2)+(txtx*2)+1] = colour;
+		((char*)videobuff)[(txty*VGA_WIDTH*2)+(txtx*2)] = '\0';
+		((char*)videobuff)[(txty*VGA_WIDTH*2)+(txtx*2)+1] = colour;
 		outb(0xe9, c);
 		update_cursor(txtx, txty);
 		return;
@@ -172,22 +173,23 @@ void putc_at(const uint16_t c, const uint8_t colour, size_t txtx, size_t txty) {
 	if (c == '\n') {txtx = 0; txty++; update_cursor(txtx, txty); return;}
 	if (c == KEY_TAB) {for (size_t i = 0; i < tabw; ++i) putc_at(' ', colour, txtx, txty); return;}
 
-	((char*)videobuff)[(txty*80*2)+(txtx*2)] = c;
-	((char*)videobuff)[(txty*80*2)+(txtx*2)+1] = colour;
+	((char*)videobuff)[(txty*VGA_WIDTH*2)+(txtx*2)] = c;
+	((char*)videobuff)[(txty*VGA_WIDTH*2)+(txtx*2)+1] = colour;
 	outb(0xe9, c);
 }
 
 void putc(const uint16_t c) {
 	if (txty < 0) txty = 0;
 	if (txtx < 0) txtx = 0;
+	if (txty >= VGA_HEIGHT) scroll_terminal();
 
 	if (c == '\b') {--txtx;
 		if (txtx < 0) {
 			txtx = 0; --txty;
-			while ( ((char*)videobuff)[(txty*80*2) + (txtx*2)] != '\0') {txtx++;};
+			while ( ((char*)videobuff)[(txty*VGA_WIDTH*2) + (txtx*2)] != '\0') {txtx++;};
 		}
-		((char*)videobuff)[(txty*80*2)+(txtx*2)] = '\0';
-		((char*)videobuff)[(txty*80*2)+(txtx*2)+1] = colour;
+		((char*)videobuff)[(txty*VGA_WIDTH*2)+(txtx*2)] = '\0';
+		((char*)videobuff)[(txty*VGA_WIDTH*2)+(txtx*2)+1] = colour;
 		outb(0xe9, c);
 		update_cursor(txtx, txty);
 		return;
@@ -195,10 +197,10 @@ void putc(const uint16_t c) {
 
 	if (c == 0) return;
 	if (c == '\n') {txtx = 0; txty++; update_cursor(txtx, txty); return;}
-	if (c == KEY_TAB) {for (size_t i = 0; i < tabw; ++i) putc_at(' ', colour, txtx, txty); return;}
+	if (c == KEY_TAB) {for (size_t i = 0; i < tabw; ++i) putc(' '); return;}
 
-	((char*)videobuff)[(txty*80*2)+(txtx*2)] = c;
-	((char*)videobuff)[(txty*80*2)+(txtx*2)+1] = colour;
+	((char*)videobuff)[(txty*VGA_WIDTH*2)+(txtx*2)] = c;
+	((char*)videobuff)[(txty*VGA_WIDTH*2)+(txtx*2)+1] = colour;
 
 	if (txtx <= VGA_WIDTH) {
 		txtx++;
@@ -261,4 +263,20 @@ void print_int(int num, uint8_t colour) {
 	while (--i >= 0) {
 		putc_coloured(buffer[i],colour);
 	}
+}
+
+void scroll_terminal() {
+    for (size_t y = 1; y < VGA_HEIGHT; ++y) {
+        for (size_t x = 0; x < VGA_WIDTH; ++x) {
+            txtbuff[(y - 1) * VGA_WIDTH + x] = txtbuff[y * VGA_WIDTH + x];
+        }
+    }
+
+    for (size_t x = 0; x < VGA_WIDTH; ++x) {
+        txtbuff[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = vga_entry(' ', colour);
+    }
+
+    txty = VGA_HEIGHT - 1;
+    txtx = 0;
+    update_cursor(txtx, txty);
 }

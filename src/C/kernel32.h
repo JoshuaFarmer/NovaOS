@@ -11,3 +11,4 @@
 #include "ata.h"
 #include "fat.h"
 #include "emu.h"
+#include "video.h"

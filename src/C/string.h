@@ -85,3 +85,19 @@ char* strdup(const char* s) {
 	strcpy(dup, s); // Copy the contents of the original string into the new string
 	return dup;
 }
+
+char *strncpy(char *dest, const char *src, size_t n) {
+    size_t i;
+
+    // Copy up to n characters from src to dest
+    for (i = 0; i < n && src[i] != '\0'; i++) {
+        dest[i] = src[i];
+    }
+
+    // If src has fewer than n characters, pad the rest with '\0'
+    for (; i < n; i++) {
+        dest[i] = '\0';
+    }
+
+    return dest;
+}
