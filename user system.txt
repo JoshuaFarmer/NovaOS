@@ -1,0 +1,10 @@
+the plan is simple
+note, / reperesents root.
+/users.ini
+
+with the contents
+DEFUSER"<NAME>","<HOME_DIR>",<HAS_ROOT_ACCESS>,<OTHER_OPTIONAL_FLAGS>,.
+
+for example:
+	DEFUSER"Root","/users/root",TRUE,is_root=TRUE.
+	DEFUSER"Joshua","/users/Joshua",FALSE.

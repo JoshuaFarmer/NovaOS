@@ -47,7 +47,7 @@ void kernel_main() {
 
 	identify_ata(0xA0); // master drive
 	uint16_t* kbdbuf = malloc(128 * sizeof(uint16_t));
-	system_user = malloc(32);
+	system_user = malloc(64);
 
 	fat_BS_t* bs = malloc(512);
 	read_boot_sector(0xA0, bs);
@@ -111,6 +111,29 @@ void system(const uint16_t* sys) {
 		}
 	}
 
+	else if (strcmp(cmd[0], "twans") == 0) {
+		puts_coloured("#############\n", VGA_COLOR_LIGHT_CYAN);
+		puts_coloured("#############\n", VGA_COLOR_LIGHT_RED);
+		puts_coloured("#############\n", VGA_COLOR_WHITE);
+		puts_coloured("#############\n", VGA_COLOR_LIGHT_RED);
+		puts_coloured("#############\n", VGA_COLOR_LIGHT_CYAN);
+	}
+
+	else if (strcmp(cmd[0], "gae") == 0) {
+		puts_coloured("#############\n", VGA_COLOR_RED);
+		puts_coloured("#############\n", VGA_COLOR_BROWN);
+		puts_coloured("#############\n", VGA_COLOR_GREEN);
+		puts_coloured("#############\n", VGA_COLOR_BLUE);
+		puts_coloured("#############\n", VGA_COLOR_MAGENTA);
+	}
+
+	else if (strcmp(cmd[0], "nobin") == 0) {
+		puts_coloured("#############\n", VGA_COLOR_LIGHT_BROWN);
+		puts_coloured("#############\n", VGA_COLOR_WHITE);
+		puts_coloured("#############\n", VGA_COLOR_MAGENTA);
+		puts_coloured("#############\n", VGA_COLOR_DARK_GREY);
+	}
+
 	else if (strcmp(cmd[0], "clear") == 0) {
 		clsscr();
 		txtx = 0;
@@ -145,8 +168,8 @@ void system(const uint16_t* sys) {
 
 	else if (strcmp(cmd[0], "") == 0) {}
 	else {
-		puts("COMMAND: "); puts(cmd[0]); putc('\n');
-		puts("ARG(S): "); putc('\n');
+		printf("COMMAND: %s\n", cmd[0]);
+		printf("ARG(S):\n");
 		for (int k = 1; k < c; ++k) {;
 			puts(cmd[k]); putc('\n');
 		}
