@@ -174,7 +174,7 @@ void putc_at(const uint16_t c, const uint8_t colour, size_t txtx, size_t txty) {
 
 	if (c == 0) return;
 	if (c == '\n') {txtx = 0; txty++; update_cursor(txtx, txty); return;}
-	if (c == KEY_TAB) {for (size_t i = 0; i < tabw; ++i) putc_at(' ', colour, txtx, txty); return;}
+	if (c == KEY_TAB || c == '\t') {for (size_t i = 0; i < tabw; ++i) putc_at(' ', colour, txtx, txty); return;}
 
 	((char*)videobuff)[(txty*VGA_WIDTH*2)+(txtx*2)] = c;
 	((char*)videobuff)[(txty*VGA_WIDTH*2)+(txtx*2)+1] = colour;
@@ -200,7 +200,7 @@ void putc(const uint16_t c) {
 
 	if (c == 0) return;
 	if (c == '\n') {txtx = 0; txty++; update_cursor(txtx, txty); return;}
-	if (c == KEY_TAB) {for (size_t i = 0; i < tabw; ++i) putc(' '); return;}
+	if (c == KEY_TAB || c == '\t') {for (size_t i = 0; i < tabw; ++i) putc(' '); return;}
 
 	((char*)videobuff)[(txty*VGA_WIDTH*2)+(txtx*2)] = c;
 	((char*)videobuff)[(txty*VGA_WIDTH*2)+(txtx*2)+1] = colour;
@@ -285,37 +285,48 @@ void scroll_terminal() {
 }
 
 error_t printf(const char* format, ...) {
+	int termcolour=colour;
 	va_list args;
 	va_start(args, format);
-
+	
 	const char* p = format;
+	int tmp=0;
 	while (*p) {
 		if (*p == '%' && *(p + 1)) {
 			p++;
 			switch (*p) {
+				case 'T': {
+					p++;
+
+					tmp = atoi(p);
+					p+=numlen(p);
+					if (*p == '.') { termcolour = tmp; }
+					else { break; }
+					break;
+				}
 				case 'c': {
 					char c = (char) va_arg(args, int);
-					putc(c);
+					putc_coloured(c,termcolour);
 					break;
 				}
 				case 'd': {
 					int i = va_arg(args, int);
-					print_int(i, colour);
+					print_int(i, termcolour);
 					break;
 				}
 				case 's': {
 					const char* str = va_arg(args, const char*);
-					puts(str);
+					puts_coloured(str,termcolour);
 					break;
 				}
 				default: {
-					putc('%');
-					putc(*p);
+					putc_coloured('%',termcolour);
+					putc_coloured(*p,termcolour);
 					break;
 				}
 			}
 		} else {
-			putc(*p);
+			putc_coloured(*p,termcolour);
 		}
 		p++;
 	}

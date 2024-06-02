@@ -87,17 +87,52 @@ char* strdup(const char* s) {
 }
 
 char *strncpy(char *dest, const char *src, size_t n) {
-    size_t i;
+	size_t i;
 
-    // Copy up to n characters from src to dest
-    for (i = 0; i < n && src[i] != '\0'; i++) {
-        dest[i] = src[i];
-    }
+	// Copy up to n characters from src to dest
+	for (i = 0; i < n && src[i] != '\0'; i++) {
+		dest[i] = src[i];
+	}
 
-    // If src has fewer than n characters, pad the rest with '\0'
-    for (; i < n; i++) {
-        dest[i] = '\0';
-    }
+	// If src has fewer than n characters, pad the rest with '\0'
+	for (; i < n; i++) {
+		dest[i] = '\0';
+	}
 
-    return dest;
+	return dest;
+}
+
+size_t numlen(const char* str) {
+	size_t i = 0;
+	while (*str >= '0' && *str <= '9') {
+		str++; i++;
+	}
+	return i;
+}
+
+int atoi(const char* str) {
+	int result = 0;
+	int sign = 1;
+
+	// Handle leading whitespace
+	while (*str == ' ' || *str == '\t') {
+		str++;
+	}
+
+	// Handle sign
+	if (*str == '-') {
+		sign = -1;
+		str++;
+	} else if (*str == '+') {
+		str++;
+	}
+
+	// Convert digits to integer
+	while (*str >= '0' && *str <= '9') {
+		result = result * 10 + (*str - '0');
+		str++;
+	}
+
+	// Apply sign
+	return result * sign;
 }

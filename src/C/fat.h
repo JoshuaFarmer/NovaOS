@@ -58,38 +58,27 @@ typedef struct fat_BS
 }__attribute__((packed)) fat_BS_t;
 
 uint32_t get_total_sectors(fat_BS_t* fat_boot) {
-	int total_sectors = (fat_boot->total_sectors_16 == 0)? fat_boot->total_sectors_32 : fat_boot->total_sectors_16;
-	return total_sectors;
+    return (fat_boot->total_sectors_16 == 0) ? fat_boot->total_sectors_32 : fat_boot->total_sectors_16;
 }
 
 uint32_t get_fat_size(fat_BS_t* fat_boot) {
-	int fat_size = fat_boot->table_size_16;
-	return fat_size;
+    return fat_boot->table_size_16;
 }
 
 uint32_t get_root_dir_sectors(fat_BS_t* fat_boot) {
-	int root_dir_sectors = ((fat_boot->root_entry_count * 32) + (fat_boot->bytes_per_sector - 1)) / fat_boot->bytes_per_sector;
-	return root_dir_sectors;
+    return ((fat_boot->root_entry_count * 32) + (fat_boot->bytes_per_sector - 1)) / fat_boot->bytes_per_sector;
 }
 
 uint32_t get_first_data_sector(fat_BS_t* fat_boot) {
-	int first_data_sector = fat_boot->reserved_sector_count + (fat_boot->table_count * get_fat_size(fat_boot) + get_root_dir_sectors(fat_boot));
-	return first_data_sector;
-}
-
-uint32_t get_first_fat(fat_BS_t* fat_boot) {
-	int first_fat_sector = fat_boot->reserved_sector_count;
-	return first_fat_sector;
+    return fat_boot->reserved_sector_count + (fat_boot->table_count * get_fat_size(fat_boot)) + get_root_dir_sectors(fat_boot);
 }
 
 uint32_t get_total_data_sectors(fat_BS_t* fat_boot) {
-	int data_sectors = get_total_sectors(fat_boot) - (fat_boot->reserved_sector_count + (fat_boot->table_count * get_fat_size(fat_boot)) + get_root_dir_sectors(fat_boot));
-	return data_sectors;
+    return get_total_sectors(fat_boot) - (fat_boot->reserved_sector_count + (fat_boot->table_count * get_fat_size(fat_boot)) + get_root_dir_sectors(fat_boot));
 }
 
 uint32_t get_total_clusters(fat_BS_t* fat_boot) {
-	int total_clusters = get_total_data_sectors(fat_boot) / fat_boot->sectors_per_cluster;
-	return total_clusters;
+    return ((fat_boot->total_sectors_16 == 0) ? fat_boot->total_sectors_32 : fat_boot->total_sectors_16) / fat_boot->sectors_per_cluster;
 }
 
 uint32_t get_first_root_dir_sector(fat_BS_t* fat_boot) {
@@ -165,13 +154,119 @@ typedef enum {
 	FAT32_c,
 } FatType_t;
 
+uint32_t get_first_fat(fat_BS_t* fat_boot) {
+	int first_fat_sector = fat_boot->reserved_sector_count;
+	return first_fat_sector;
+}
+
 FatType_t get_fat_type(fat_BS_t* fat_boot) {
-	const uint32_t total_clusters = get_total_clusters(fat_boot);
-	if (total_clusters < 4085) { return FAT12_c; }
-	if (total_clusters < 65525) { return FAT16_c; }
-	else { return FAT32_c; }
+    uint32_t total_clusters = get_total_clusters(fat_boot);
+    if (total_clusters < 4085) { return FAT12_c; }
+    if (total_clusters < 65525) { return FAT16_c; }
+    return FAT32_c;
 }
 
 void read_boot_sector(uint8_t drive, fat_BS_t *bs) {
     LBA28_read_sector(drive, 0, 1, (uint16_t*)bs);
+    printf("%T9.bytes_per_sector: %T14.%d\n", bs->bytes_per_sector);
+    printf("%T9.sectors_per_cluster: %T14.%d\n", bs->sectors_per_cluster);
+    printf("%T9.reserved_sector_count: %T14.%d\n", bs->reserved_sector_count);
+    printf("%T9.table_count: %T14.%d\n", bs->table_count);
+    printf("%T9.total_sectors_16: %T14.%d\n", bs->total_sectors_16);
+    printf("%T9.total_sectors_32: %T14.%d\n", bs->total_sectors_32);
+    printf("%T9.table_size_16: %T14.%d\n", bs->table_size_16);
+}
+
+
+// Function to compare file names (8.3 format)
+int compare_filenames(const char* filename1, const char* filename2) {
+	return strncmp(filename1, filename2, 11) == 0;
+}
+
+void read_file(uint8_t drive, const char* filename, uint8_t* buffer, uint32_t buffer_size) {
+	asm("cli");
+
+    fat_BS_t bs;
+    read_boot_sector(drive, &bs);
+
+    FatType_t fat_type = get_fat_type(&bs);
+    if (fat_type != FAT32_c) {
+        // Only FAT32 is supported by this function
+        printf("Unsupported FAT type\n");
+        return;
+    }
+
+    // Get the first sector of the root directory
+    fat_extBS_32_t* fat_ext_bs = (fat_extBS_32_t*)(&bs.extended_section);
+    uint32_t root_cluster = get_first_root_dir_cluster32(fat_ext_bs);
+    uint32_t first_sector = get_first_sector_of_cluster(&bs, root_cluster);
+
+    // Loop through root directory entries to find the file
+    fat_file_t file_entry;
+    uint32_t sector = first_sector;
+    uint32_t entry_count = 0;
+    int file_found = 0;
+
+    printf("Searching for file in root directory...\n");
+
+    while (!file_found && sector < (first_sector + bs.sectors_per_cluster)) {
+        LBA28_read_sector(drive, sector, 1, (uint16_t*)&file_entry);
+
+        // Loop through each file entry in the sector
+        for (uint32_t i = 0; i < bs.bytes_per_sector / sizeof(fat_file_t); i++) {
+            if (file_entry.name[0] == 0x00) {
+                // No more entries in this directory
+                printf("End of directory entries\n");
+                break;
+            }
+
+            if ((file_entry.attr & 0x0F) == 0x0F) {
+                // Long file name entry, skip it
+                continue;
+            }
+
+            if (compare_filenames((char*)file_entry.name, filename)) {
+                // File found
+                file_found = 1;
+                printf("File found: %s\n", filename);
+                break;
+            }
+
+            entry_count++;
+        }
+
+        sector++;
+    }
+
+    if (!file_found) {
+        // File not found
+        printf("File not found: %s\n", filename);
+        return;
+    }
+
+    // Read the file
+    uint32_t cluster = ((uint32_t)file_entry.h_firstclus << 16) | file_entry.l_firstclus;
+    uint32_t bytes_read = 0;
+
+    printf("Reading file data...\n");
+
+    while (cluster >= 2 && cluster < 0x0FFFFFF8 && bytes_read < buffer_size) {
+        sector = get_first_sector_of_cluster(&bs, cluster);
+        uint32_t sectors_to_read = bs.sectors_per_cluster;
+
+        for (uint32_t i = 0; i < sectors_to_read && bytes_read < buffer_size; i++) {
+            LBA28_read_sector(drive, sector + i, 1, (uint16_t*)(buffer + bytes_read));
+            bytes_read += bs.bytes_per_sector;
+        }
+
+        // Get the next cluster
+        uint32_t fat_sector = get_first_fat(&bs) + (cluster * 4 / bs.bytes_per_sector);
+        uint32_t fat_offset = (cluster * 4) % bs.bytes_per_sector;
+        uint32_t next_cluster;
+
+        LBA28_read_sector(drive, fat_sector, 1, (uint16_t*)&next_cluster);
+        cluster = next_cluster >> fat_offset;
+    }
+
+    printf("File read complete, bytes read: %u\n", bytes_read);
 }

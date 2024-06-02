@@ -41,9 +41,10 @@ void kernel_main() {
 	init_pit();
 	beep(650, 500);
 
-	set_text_mode(1);
-	VGA_WIDTH = 90;
-	VGA_HEIGHT = 60;
+	// ignore for now
+	// set_text_mode(1);
+	// VGA_WIDTH = 90;
+	// VGA_HEIGHT = 60;
 
 	identify_ata(0xA0); // master drive
 	uint16_t* kbdbuf = malloc(128 * sizeof(uint16_t));
@@ -52,10 +53,12 @@ void kernel_main() {
 	fat_BS_t* bs = malloc(512);
 	read_boot_sector(0xA0, bs);
 	int total_sec = get_total_sectors(bs);
-	memcpy(system_user, "Default", 128);
+	memcpy(system_user, "default", 128);
+
+	//read_file(0xA0, "A      TXT", kbdbuf, 256);
 
 	size_t heap_size = remaining_heap_space();
-	printf("%d bytes left in the heap\n", heap_size);
+	printf("%T9.heap size:%T14. %d\n", heap_size);
 
 	while (running) {
 		puts_coloured((const char*)system_user, VGA_COLOR_LIGHT_BROWN);
