@@ -36,7 +36,6 @@ void init(void) {
 }
 
 void kernel_main() {
-	//idt_init();
 	init();
 	init_heap();
 	init_pit();
@@ -54,6 +53,13 @@ void kernel_main() {
 
 	fat_BS_t* bs = malloc(512);
 	read_boot_sector(0xA0, bs);
+	printf("%T10.bytes_per_sector: %T14.%d\n", bs->bytes_per_sector);
+    printf("%T10.sectors_per_cluster: %T14.%d\n", bs->sectors_per_cluster);
+    printf("%T10.reserved_sector_count: %T14.%d\n", bs->reserved_sector_count);
+    printf("%T10.table_count: %T14.%d\n", bs->table_count);
+    printf("%T10.total_sectors_16: %T14.%d\n", bs->total_sectors_16);
+    printf("%T10.total_sectors_32: %T14.%d\n", bs->total_sectors_32);
+    printf("%T10.table_size_16: %T14.%d\n", bs->table_size_16);
 
 	uint16_t* kbdbuf = malloc(128 * sizeof(uint16_t));
 

@@ -175,13 +175,6 @@ FatType_t get_fat_type(fat_BS_t* fat_boot) {
 
 void read_boot_sector(uint8_t drive, fat_BS_t *bs) {
     LBA28_read_sector(drive, 0, 1, (uint16_t*)bs);
-    printf("%T10.bytes_per_sector: %T14.%d\n", bs->bytes_per_sector);
-    printf("%T10.sectors_per_cluster: %T14.%d\n", bs->sectors_per_cluster);
-    printf("%T10.reserved_sector_count: %T14.%d\n", bs->reserved_sector_count);
-    printf("%T10.table_count: %T14.%d\n", bs->table_count);
-    printf("%T10.total_sectors_16: %T14.%d\n", bs->total_sectors_16);
-    printf("%T10.total_sectors_32: %T14.%d\n", bs->total_sectors_32);
-    printf("%T10.table_size_16: %T14.%d\n", bs->table_size_16);
 }
 
 
