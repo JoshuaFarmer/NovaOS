@@ -10,10 +10,10 @@ memory protection - GONNA DO SOON ? <br>
 	<h3>PRINTF FORMATTING</h3>
 	the printf formatting is very simple in this implementation of<br>
 	printf, only having<br>
-	- s<br>
-	- d<br>
-	- c<br>
-	- T<br>
+* s<br>
+* d<br>
+* c<br>
+* T<br>
 	s,d,c are the standard functions, however we have this "T"<br>
 	which is for setting the display colour.<br>
 	it's very easy to use in my opinion,<br>
