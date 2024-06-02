@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
-#include "typedef.h"
 
+#include "typedef.h"
 #include "io.h"
 #include "string.h"
 #include "terminal.h"

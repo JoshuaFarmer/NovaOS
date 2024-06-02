@@ -49,11 +49,6 @@ void kernel_main() {
 	system_user = malloc(32);
 
 	memcpy(system_user, "Default", 128);
-	
-	uint8_t bootsec[512];
-	LBA28_read_sector(0xA0, 1, 1, (uint16_t*)bootsec);
-	
-	FatType_t fat = get_fat_type((fat_BS_t*)bootsec);
 
 	size_t heap_size = remaining_heap_space();
 	print_int(heap_size,VGA_COLOR_LIGHT_GREEN);
