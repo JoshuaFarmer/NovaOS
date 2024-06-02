@@ -55,16 +55,15 @@ void kernel_main() {
 	int total_sec = get_total_sectors(bs);
 	memcpy(system_user, "default", 128);
 
+	uint8_t* current_dir = malloc(12);
+	strcpy((char*)current_dir, "/root/");
 	//read_file(0xA0, "A      TXT", kbdbuf, 256);
 
 	size_t heap_size = remaining_heap_space();
-	printf("%T9.heap size:%T14. %d\n", heap_size);
+	printf("%T10.heap size:%T14. %d\n", heap_size);
 
 	while (running) {
-		puts_coloured((const char*)system_user, VGA_COLOR_LIGHT_BROWN);
-		putc_coloured(':',VGA_COLOR_LIGHT_GREY);
-		putc_coloured('/', VGA_COLOR_LIGHT_BLUE);
-		puts_coloured("$ ", VGA_COLOR_LIGHT_GREY);
+		printf("%T10.%s%T7.@%T9.%s%T7.", system_user, current_dir);
 		gets((uint16_t*)kbdbuf, 128);
 
 		system((const uint16_t*)kbdbuf);
