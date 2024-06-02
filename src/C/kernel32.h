@@ -12,3 +12,4 @@
 #include "fat.h"
 #include "emu.h"
 #include "video.h"
+#include "exception.h"

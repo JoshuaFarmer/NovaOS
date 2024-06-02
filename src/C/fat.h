@@ -152,6 +152,7 @@ typedef enum {
 	FAT12_c,
 	FAT16_c,
 	FAT32_c,
+	NONE_c,
 } FatType_t;
 
 uint32_t get_first_fat(fat_BS_t* fat_boot) {
@@ -160,7 +161,13 @@ uint32_t get_first_fat(fat_BS_t* fat_boot) {
 }
 
 FatType_t get_fat_type(fat_BS_t* fat_boot) {
-    uint32_t total_clusters = get_total_clusters(fat_boot);
+	if (fat_boot->sectors_per_cluster == 0) {
+		return NONE_c;
+	} if (fat_boot->total_sectors_32 == 0) {
+		return NONE_c;
+	}
+
+    uint32_t total_clusters = fat_boot->total_sectors_32 / fat_boot->sectors_per_cluster;
     if (total_clusters < 4085) { return FAT12_c; }
     if (total_clusters < 65525) { return FAT16_c; }
     return FAT32_c;

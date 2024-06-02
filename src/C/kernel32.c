@@ -36,6 +36,7 @@ void init(void) {
 }
 
 void kernel_main() {
+	//idt_init();
 	init();
 	init_heap();
 	init_pit();
@@ -45,22 +46,23 @@ void kernel_main() {
 	// set_text_mode(1);
 	// VGA_WIDTH = 90;
 	// VGA_HEIGHT = 60;
+	void* vd = malloc(1024);
 
-	identify_ata(0xA0); // master drive
-	uint16_t* kbdbuf = malloc(128 * sizeof(uint16_t));
+	identify_ata(0xA0);
 	system_user = malloc(64);
+	memcpy(system_user, "default", 128);
 
 	fat_BS_t* bs = malloc(512);
 	read_boot_sector(0xA0, bs);
-	int total_sec = get_total_sectors(bs);
-	memcpy(system_user, "default", 128);
+
+	uint16_t* kbdbuf = malloc(128 * sizeof(uint16_t));
 
 	uint8_t* current_dir = malloc(12);
 	strcpy((char*)current_dir, "/root/");
-	//read_file(0xA0, "A      TXT", kbdbuf, 256);
 
 	size_t heap_size = remaining_heap_space();
-	printf("%T10.heap size:%T14. %d\n", heap_size);
+	printf("%T10.heap size:%T14. %d\n", HEAP_CAP);
+	printf("%T10.remaining heap space:%T14. %d\n", heap_size);
 
 	while (running) {
 		printf("%T10.%s%T7.@%T9.%s%T7.", system_user, current_dir);
@@ -71,6 +73,7 @@ void kernel_main() {
 
 	free(kbdbuf);
 	free(system_user);
+	free(current_dir);
 	outw(0x604,0x2000); // qemu only iirc
 }
 

@@ -8,7 +8,7 @@ clang -m32 -c "src/asm/boot.s" -o "bin/boot.o" -march=i386
 clang -m32 -c -ffreestanding "src/C/kernel32.c" -o "bin/krnl32.o" -Wall -Wextra -march=i386
 
 # Link the object files to create the binary
-ld -m elf_i386 -T linker.ld -o bin/Nova.bin -O2 -nostdlib bin/boot.o bin/krnl32.o
+ld -m elf_i386 -T linker.ld -o bin/Nova.bin -O2 -nostdlib "bin/boot.o" "bin/krnl32.o"
 
 # Check if the binary is multiboot compliant
 if grub-file --is-x86-multiboot bin/Nova.bin; then
