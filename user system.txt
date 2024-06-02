@@ -6,5 +6,9 @@ with the contents
 DEFUSER"<NAME>","<HOME_DIR>",<HAS_ROOT_ACCESS>,<OTHER_OPTIONAL_FLAGS>,.
 
 for example:
+	.USERS
 	DEFUSER"Root","/users/root",TRUE,is_root=TRUE.
 	DEFUSER"Joshua","/users/Joshua",FALSE.
+	
+	.VARS
+	Joshua.PATH"/bin","/home/bin".
