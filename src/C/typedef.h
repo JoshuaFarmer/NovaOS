@@ -54,3 +54,5 @@ typedef struct {
 #define ROOT_DIR_SECTOR 2
 #define RESERVED_SECTORS 32
 #define FAT_SECTORS 32
+
+typedef uint32_t error_t;

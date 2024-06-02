@@ -1,5 +1,8 @@
 #pragma once
+#include <stdarg.h>
+#include "typedef.h"
 #include "string.h"
+
 void putc(const uint16_t c);
 void scroll_terminal();
 
@@ -266,17 +269,57 @@ void print_int(int num, uint8_t colour) {
 }
 
 void scroll_terminal() {
-    for (size_t y = 1; y < VGA_HEIGHT; ++y) {
-        for (size_t x = 0; x < VGA_WIDTH; ++x) {
-            txtbuff[(y - 1) * VGA_WIDTH + x] = txtbuff[y * VGA_WIDTH + x];
-        }
-    }
+	for (size_t y = 1; y < VGA_HEIGHT; ++y) {
+		for (size_t x = 0; x < VGA_WIDTH; ++x) {
+			txtbuff[(y - 1) * VGA_WIDTH + x] = txtbuff[y * VGA_WIDTH + x];
+		}
+	}
 
-    for (size_t x = 0; x < VGA_WIDTH; ++x) {
-        txtbuff[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = vga_entry(' ', colour);
-    }
+	for (size_t x = 0; x < VGA_WIDTH; ++x) {
+		txtbuff[(VGA_HEIGHT - 1) * VGA_WIDTH + x] = vga_entry(' ', colour);
+	}
 
-    txty = VGA_HEIGHT - 1;
-    txtx = 0;
-    update_cursor(txtx, txty);
+	txty = VGA_HEIGHT - 1;
+	txtx = 0;
+	update_cursor(txtx, txty);
+}
+
+error_t printf(const char* format, ...) {
+	va_list args;
+	va_start(args, format);
+
+	const char* p = format;
+	while (*p) {
+		if (*p == '%' && *(p + 1)) {
+			p++;
+			switch (*p) {
+				case 'c': {
+					char c = (char) va_arg(args, int);
+					putc(c);
+					break;
+				}
+				case 'd': {
+					int i = va_arg(args, int);
+					print_int(i, colour);
+					break;
+				}
+				case 's': {
+					const char* str = va_arg(args, const char*);
+					puts(str);
+					break;
+				}
+				default: {
+					putc('%');
+					putc(*p);
+					break;
+				}
+			}
+		} else {
+			putc(*p);
+		}
+		p++;
+	}
+
+	va_end(args);
+	return 0; // Assuming 0 is success for error_t
 }

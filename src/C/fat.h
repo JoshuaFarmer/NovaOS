@@ -171,3 +171,7 @@ FatType_t get_fat_type(fat_BS_t* fat_boot) {
 	if (total_clusters < 65525) { return FAT16_c; }
 	else { return FAT32_c; }
 }
+
+void read_boot_sector(uint8_t drive, fat_BS_t *bs) {
+    LBA28_read_sector(drive, 0, 1, (uint16_t*)bs);
+}

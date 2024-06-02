@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdarg.h>
 
 #include "kernel32.h"
 
@@ -48,11 +49,13 @@ void kernel_main() {
 	uint16_t* kbdbuf = malloc(128 * sizeof(uint16_t));
 	system_user = malloc(32);
 
+	fat_BS_t* bs = malloc(512);
+	read_boot_sector(0xA0, bs);
+	int total_sec = get_total_sectors(bs);
 	memcpy(system_user, "Default", 128);
 
 	size_t heap_size = remaining_heap_space();
-	print_int(heap_size,VGA_COLOR_LIGHT_GREEN);
-	puts_coloured(" Bytes left in the Heap\n", VGA_COLOR_LIGHT_GREEN);
+	printf("%d bytes left in the heap\n", heap_size);
 
 	while (running) {
 		puts_coloured((const char*)system_user, VGA_COLOR_LIGHT_BROWN);
