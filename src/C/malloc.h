@@ -2,8 +2,7 @@
 #include <stdint.h>
 #include "memory.h"
 
-#define HEAP_CAP 1024 * 64
-//#define HEAP_CAP 524288 // 2^19
+#define HEAP_CAP 1024 * 256 // 256k should be enough for everyone, right?
 
 void puts_coloured(const char* data, const uint8_t col);
 

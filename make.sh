@@ -25,7 +25,7 @@ if grub-file --is-x86-multiboot bin/Nova.bin; then
     # Create the ISO image
     grub-mkrescue -o bin/Nova.iso isodir
 
-    # Create a 5128MB raw disk image
+    # Create a 512MB raw disk image
     dd if=/dev/zero of=bin/Nova_512MB.img bs=1M count=512
 
     # Write the ISO contents into the raw disk image
