@@ -9,7 +9,6 @@
 #include "malloc.h"
 #include "sound.h"
 #include "ata.h"
-#include "fat.h"
 #include "emu.h"
 #include "video.h"
 #include "exception.h"

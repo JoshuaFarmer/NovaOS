@@ -25,24 +25,14 @@ void kernel_main() {
 
 	printf("%t#############\n%t#############\n%t#############\n%t#############\n%t#############\n", VGA_COLOR_LIGHT_CYAN,VGA_COLOR_LIGHT_RED,VGA_COLOR_WHITE,VGA_COLOR_LIGHT_RED,VGA_COLOR_LIGHT_CYAN);
 
-	fat_BS_t* bs = malloc(512);
 	uint16_t* kbdbuf = malloc(128 * sizeof(uint16_t));
 	uint8_t* current_dir = malloc(12);
 	strcpy((char*)current_dir, "/root/");
 	
-	read_boot_sector(0xA0, bs);
-	printf("%tbytes_per_sector: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,bs->bytes_per_sector);
-    printf("%tsectors_per_cluster: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,bs->sectors_per_cluster);
-    printf("%treserved_sector_count: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,bs->reserved_sector_count);
-    printf("%ttable_count: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,bs->table_count);
-    printf("%ttotal_sectors_16: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,bs->total_sectors_16);
-    printf("%ttotal_sectors_32: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,bs->total_sectors_32);
-    printf("%ttable_size_16: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,bs->table_size_16);
-
 	size_t heap_size = remaining_heap_space();
 	printf("%theap size: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,HEAP_CAP);
 	printf("%tremaining heap space: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,heap_size);
-	
+
 	shell(system_user,current_dir,kbdbuf);
 
 	free(kbdbuf);
