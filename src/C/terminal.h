@@ -296,12 +296,12 @@ error_t printf(const char* format, ...) {
 			p++;
 			switch (*p) {
 				case 'T': {
-					p++;
-
-					tmp = atoi(p);
-					p+=numlen(p);
-					if (*p == '.') { termcolour = tmp; }
-					else { break; }
+					printf("\n%tOUT OF DATE COLOUR FUNCTION\n", VGA_COLOR_LIGHT_RED);
+					break;
+				}
+				case 't': {
+					int x = va_arg(args, int);
+					termcolour = x;
 					break;
 				}
 				case 'c': {

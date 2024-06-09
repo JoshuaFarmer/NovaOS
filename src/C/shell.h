@@ -63,6 +63,10 @@ void system(const uint16_t* sys) {
 		txty = 0;
 	}
 
+	else if (strcmp(cmd[0], "help") == 0) {
+		printf("user\nclear\nhelp\nls\nexit\nedit\ntxtmode (not working ?)\n");
+	}
+
 	else if (strcmp(cmd[0], "ls") == 0) {
 		// later.
 	}
@@ -91,17 +95,17 @@ void system(const uint16_t* sys) {
 
 	else if (strcmp(cmd[0], "") == 0) {}
 	else {
-		printf("COMMAND: %s\n", cmd[0]);
-		printf("ARG(S):\n");
+		printf("COMMAND: %t%s%t\nARG(S):\n", VGA_COLOR_LIGHT_BROWN,cmd[0],colour);
 		for (int k = 1; k < c; ++k) {;
-			puts(cmd[k]); putc('\n');
+			printf("\t%t%s\n",VGA_COLOR_LIGHT_BROWN,cmd[k]);
 		}
 	}
 }
 
-void shell(const char* system_user, const char* current_dir, uint16_t* kbdbuf) {
+void shell(uint8_t* system_user, uint8_t* current_dir, uint16_t* kbdbuf) {
 	while (running) {
-		printf("%T10.%s%T7.@%T9.%s%T7.", system_user, current_dir);
+		// hahahhahahahahahahaha
+		printf("%t%s%t@%t%s", VGA_COLOR_LIGHT_BLUE, system_user, VGA_COLOR_LIGHT_GREY, VGA_COLOR_RED, current_dir);
 		gets((uint16_t*)kbdbuf, 128);
 
 		system((const uint16_t*)kbdbuf);

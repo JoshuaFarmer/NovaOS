@@ -993,7 +993,7 @@ assume: chain-4 addressing already off */
 *****************************************************************************/
 static void (*g_write_pixel)(unsigned x, unsigned y, unsigned c);
 static unsigned g_wd, g_ht;
-
+/*
 static void write_pixel1(unsigned x, unsigned y, unsigned c)
 {
 	unsigned wd_in_bytes;
@@ -1006,8 +1006,8 @@ static void write_pixel1(unsigned x, unsigned y, unsigned c)
 	mask = 0x80 >> x;
 	vpokeb(off, (vpeekb(off) & ~mask) | (c & mask));
 }
-/*****************************************************************************
-*****************************************************************************/
+*****************************************************************************
+*****************************************************************************
 static void write_pixel2(unsigned x, unsigned y, unsigned c)
 {
 	unsigned wd_in_bytes, off, mask;
@@ -1019,8 +1019,8 @@ static void write_pixel2(unsigned x, unsigned y, unsigned c)
 	mask = 0xC0 >> x;
 	vpokeb(off, (vpeekb(off) & ~mask) | (c & mask));
 }
-/*****************************************************************************
-*****************************************************************************/
+*****************************************************************************
+*****************************************************************************
 static void write_pixel4p(unsigned x, unsigned y, unsigned c)
 {
 	unsigned wd_in_bytes, off, mask, p, pmask;
@@ -1039,7 +1039,7 @@ static void write_pixel4p(unsigned x, unsigned y, unsigned c)
 			vpokeb(off, vpeekb(off) & ~mask);
 		pmask <<= 1;
 	}
-}
+}*/
 /*****************************************************************************
 *****************************************************************************/
 static void write_pixel8(unsigned x, unsigned y, unsigned c)
@@ -1136,28 +1136,7 @@ void set_text_mode(int hi_res)
 	for(i = 0; i < cols * rows; i++)
 		pokeb(0xB800, i * 2 + 1, 7);
 }
-/*****************************************************************************
-DEMO GRAPHICS MODES
-*****************************************************************************/
-static void demo_graphics(void)
-{
-/* 256-color */
-	write_regs(g_320x200x256);
-	g_wd = 320;
-	g_ht = 200;
-	g_write_pixel = write_pixel8;
-	draw_x();
-/* 256-color Mode-X */
-	write_regs(g_320x200x256_modex);
-	g_wd = 320;
-	g_ht = 200;
-	g_write_pixel = write_pixel8x;
-	draw_x();
-/* go back to 80x25 text mode */
-	set_text_mode(0);
-}
-/*****************************************************************************
-*****************************************************************************/
+
 static unsigned char reverse_bits(unsigned char arg)
 {
 	unsigned char ret_val = 0;
@@ -1180,9 +1159,7 @@ static unsigned char reverse_bits(unsigned char arg)
 		ret_val |= 0x01;
 	return ret_val;
 }
-/*****************************************************************************
-512-CHARACTER FONT
-*****************************************************************************/
+
 static void font512(void)
 {
 /* Turbo C++ 1.0 seems to 'lose' any data declared 'static const' */

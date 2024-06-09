@@ -3,8 +3,8 @@
 
 #include "typedef.h"
 #include "io.h"
-#include "string.h"
 #include "terminal.h"
+#include "string.h"
 #include "memory.h"
 #include "malloc.h"
 #include "sound.h"

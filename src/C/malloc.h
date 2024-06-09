@@ -4,7 +4,7 @@
 
 #define HEAP_CAP (1024 * 120) // 120k should be enough for everyone, right?
 
-void puts_coloured(const char* data, const uint8_t col);
+error_t printf(const char* format, ...);
 
 typedef struct {
     uint8_t  raw[HEAP_CAP];
@@ -20,7 +20,7 @@ void init_heap() {
 
 void* malloc(size_t size) {
     if (size == 0 || size > HEAP_CAP) {
-        puts_coloured("MALLOC - INVALID SIZE\n", VGA_COLOR_LIGHT_RED);
+        printf("%tMALLOC - INVALID SIZE\n", VGA_COLOR_LIGHT_RED);
         return NULL;
     }
 
@@ -39,19 +39,19 @@ void* malloc(size_t size) {
         }
         i += heap.len[i] ? heap.len[i] : 1;
     }
-    puts_coloured("MALLOC - NO SPACE IN HEAP\n", VGA_COLOR_LIGHT_RED);
+    printf("%tMALLOC - NO SPACE IN HEAP\n", VGA_COLOR_LIGHT_RED);
     return NULL;
 }
 
 void free(void* ptr) {
     if (ptr == NULL || ptr < (void*)heap.raw || ptr >= (void*)(heap.raw + HEAP_CAP)) {
-        puts_coloured("FREE - INVALID POINTER\n", VGA_COLOR_LIGHT_RED);
+        printf("%tFREE - INVALID POINTER\n", VGA_COLOR_LIGHT_RED);
         return;
     }
 
     size_t offset = (uint8_t*)ptr - heap.raw;
     if (heap.len[offset] == 0) {
-        puts_coloured("FREE - NOT FOUND IN THE HEAP\n", VGA_COLOR_LIGHT_RED);
+        printf("%tFREE - NOT FOUND IN THE HEAP\n", VGA_COLOR_LIGHT_RED);
         return;
     }
 

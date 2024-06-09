@@ -14,10 +14,10 @@ void identify_ata(uint8_t drive) {
 	if (tmp & STATUS_RDY) {
 		switch (drive) {
 			case 0xA0:
-				printf("%T10.Master Drive is the current active Drive\n");
+				printf("%tMaster Drive is the current active Drive\n",VGA_COLOR_LIGHT_GREEN);
 				break;
 			case 0xB0:
-				printf("%T10.Slave Drive is the current active Drive\n");
+				printf("%t.Slave Drive is the current active Drive\n",VGA_COLOR_LIGHT_GREEN);
 				break;
 		}
 	}
@@ -40,9 +40,9 @@ void wait_DRQ() { while(!(inb(0x1F7) & STATUS_RDY)); }
 uint16_t* LBA28_read_sector(uint8_t drive, uint32_t LBA, uint32_t sector, uint16_t *addr) {
 	LBA &= 0x0FFFFFFF;
 	
-    printf("%T10.Drive: %T14.%d\n", drive);
-    printf("%T10.LBA: %T14.%d\n", LBA);
-    printf("%T10.Sector count: %T14.%d\n", sector);
+    printf("%tDrive: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,drive);
+    printf("%tLBA: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,LBA);
+    printf("%tSector count: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,sector);
 
 	wait_BSY();
 	outb(0x1F6, drive | ((LBA >> 24) & 0xF));
@@ -58,7 +58,7 @@ uint16_t* LBA28_read_sector(uint8_t drive, uint32_t LBA, uint32_t sector, uint16
 	for (uint32_t j = 0; j < sector; j ++) {
 		wait_BSY();
 		wait_DRQ();
-		printf("%T10.reading sector: %T14.%d\n", LBA + j);
+		printf("%treading sector: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,LBA + j);
 		for (uint32_t i = 0; i < 256; i++) {
 			tmp[i] = inw(0x1F0);
 		}
