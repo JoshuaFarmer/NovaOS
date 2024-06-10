@@ -1,8 +1,7 @@
 simple 32 bit operating system. <br>
 Todo: <br>
-finish fat32 - DOING <br>
+finish EXT-2 <br>
 graphics mode text - DONE ? <br>
-memory protection - GONNA DO SOON ? <br>
 
 <h1>RANDOM STUFF</h1>
 <p>
