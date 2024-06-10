@@ -18,8 +18,22 @@
 /
 /----------------------------------------------------------------------------*/
 
+typedef int size_t;
+size_t strlen(const char* str);
+int strcmp(const char *s1, const char *s2);
+int strncmp(const char *s1, const char *s2, size_t n);
+char* strpbrk(const char* s, const char* accept);
+char* strtok(char* str, const char* delim);
+char* strcpy(register char *to, register const char *from);
+char* strdup(const char* s);
+char *strncpy(char *dest, const char *src, size_t n);
+size_t numlen(const char* str);
+int atoi(const char* str);
+char *strchr(const char *str, int c);
+void *memset(void *ptr, int value, size_t num);
+void* memcpy(void *dest, const void *src, size_t len);
+int memcmp(const void *s1, const void *s2, size_t n);
 
-#include <string.h>
 #include "ff.h"			/* Declarations of FatFs API */
 #include "diskio.h"		/* Declarations of device I/O functions */
 
@@ -273,7 +287,7 @@
 #endif
 #define GET_FATTIME()	((DWORD)(FF_NORTC_YEAR - 1980) << 25 | (DWORD)FF_NORTC_MON << 21 | (DWORD)FF_NORTC_MDAY << 16)
 #else
-#define GET_FATTIME()	get_fattime()
+#define GET_FATTIME()	((DWORD)(FF_NORTC_YEAR - 1980) << 25 | (DWORD)FF_NORTC_MON << 21 | (DWORD)FF_NORTC_MDAY << 16)
 #endif
 
 

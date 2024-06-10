@@ -12,7 +12,7 @@ void kernel_main() {
 	init();
 	// init_heap();
 	init_pit();
-	beep(440, 1000);
+	beep(440, 500);
 
 	set_text_mode(1);
 	VGA_WIDTH = 90;
@@ -31,11 +31,11 @@ void kernel_main() {
 	
 	uint16_t* kbdbuf[512];
 	uint8_t* current_dir[32];
-	strcpy((char*)current_dir, "/root/");
+	strcpy((char*)current_dir, "/");
 	
-	// size_t heap_size = remaining_heap_space();
-	// printf("%theap size: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,HEAP_CAP);
-	// printf("%tremaining heap space: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,heap_size);
+	size_t heap_size = remaining_heap_space();
+	printf("%theap size: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,HEAP_CAP);
+	printf("%tremaining heap space: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,heap_size);
 
 	shell((uint8_t*)system_user,(uint8_t*)current_dir,(uint16_t*)kbdbuf);
 

@@ -39,6 +39,8 @@ enum vga_color {
 #define ROOT_DIR_SECTOR 2
 #define RESERVED_SECTORS 32
 #define FAT_SECTORS 32
+#define cli() asm("cli");
+#define sti() asm("sti");
 
 typedef uint32_t error_t;
 typedef uint8_t BYTE;

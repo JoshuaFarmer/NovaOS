@@ -21,6 +21,15 @@ void syserr(const char* s) {
 	while(1);
 }
 
+void init_rtc() {
+	cli();		// important that no interrupts happen (perform a CLI)
+	outb(0x70, 0x8A);	// select Status Register A, and disable NMI (by setting the 0x80 bit)
+	outb(0x71, 0x20);	// write to CMOS/RTC RAM
+	sti();		// (perform an STI) and reenable NMI if you wish
+}
+
+#include "ff.h" // Include FatFs header file
+
 #include "string.h"
 #include "memory.h"
 #include "malloc.h"

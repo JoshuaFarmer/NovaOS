@@ -136,3 +136,16 @@ int atoi(const char* str) {
 	// Apply sign
 	return result * sign;
 }
+
+char *strchr(const char *str, int c) {
+    while (*str != '\0') {
+        if (*str == c) {
+            return (char *)str; // Found the character, return its address
+        }
+        str++; // Move to the next character in the string
+    }
+    if (c == '\0') {
+        return (char *)str; // Return the null terminator if c is '\0'
+    }
+    return NULL; // If the character is not found, return NULL
+}
