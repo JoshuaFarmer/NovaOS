@@ -38,6 +38,7 @@ typedef struct {
 	char dl;
 } raw_disk_info;
 
+#define vgabuff 0xA0000
 #define videobuff 0xB8000
 #define KEYBOARD_STATUS_PORT 0x64
 #define KEYBOARD_DATA_PORT 0x60
