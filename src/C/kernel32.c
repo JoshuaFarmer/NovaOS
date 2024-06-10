@@ -25,7 +25,6 @@ void kernel_main() {
 	//	((uint8_t*)vgabuff)[320 * 10 + 10] = 0x1;
 	//}
 
-	identify_ata(0xA0);
 	memcpy(system_user, "default", 32);
 
 	// printf("%t#############\n%t#############\n%t#############\n%t#############\n%t#############\n", VGA_COLOR_LIGHT_CYAN,VGA_COLOR_LIGHT_RED,VGA_COLOR_WHITE,VGA_COLOR_LIGHT_RED,VGA_COLOR_LIGHT_CYAN);

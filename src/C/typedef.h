@@ -41,3 +41,11 @@ enum vga_color {
 #define FAT_SECTORS 32
 
 typedef uint32_t error_t;
+typedef uint8_t BYTE;
+typedef uint16_t WORD;
+typedef uint32_t DWORD;
+typedef uint64_t QWORD;
+typedef WORD WCHAR;
+typedef uint32_t UINT;
+typedef uint32_t LBA_t;
+typedef uint32_t FSIZE_t;

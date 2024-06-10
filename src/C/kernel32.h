@@ -25,7 +25,11 @@ void syserr(const char* s) {
 #include "memory.h"
 #include "malloc.h"
 #include "sound.h"
-#include "ata.h"
+// #include "ata.h"
+#include "diskio.h"
+#include "ff.h"
+#include "ffconf.h"
+
 #include "emu.h"
 #include "video.h"
 #include "exception.h"
