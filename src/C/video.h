@@ -919,34 +919,29 @@ static void vmemwr(unsigned dst_off, unsigned char *src, unsigned count)
 	_vmemwr(get_fb_seg(), dst_off, src, count);
 }
 /*****************************************************************************
-*****************************************************************************/
+*****************************************************************************//*
 static void vpokeb(unsigned off, unsigned val)
 {
 	pokeb(get_fb_seg(), off, val);
-}
+}*/
 /*****************************************************************************
 *****************************************************************************/
+/*
 static unsigned vpeekb(unsigned off)
 {
 	return peekb(get_fb_seg(), off);
 }
-/*****************************************************************************
-write font to plane P4 (assuming planes are named P1, P2, P4, P8)
-*****************************************************************************/
+*/
 static void write_font(unsigned char *buf, unsigned font_height)
 {
 	unsigned char seq2, seq4, gc4, gc5, gc6;
 	unsigned i;
 
-/* save registers
-set_plane() modifies GC 4 and SEQ 2, so save them as well */
 	outb(VGA_SEQ_INDEX, 2);
 	seq2 = inb(VGA_SEQ_DATA);
 
 	outb(VGA_SEQ_INDEX, 4);
 	seq4 = inb(VGA_SEQ_DATA);
-/* turn off even-odd addressing (set flat addressing)
-assume: chain-4 addressing already off */
 	outb(VGA_SEQ_DATA, seq4 | 0x04);
 
 	outb(VGA_GC_INDEX, 4);
@@ -954,30 +949,24 @@ assume: chain-4 addressing already off */
 
 	outb(VGA_GC_INDEX, 5);
 	gc5 = inb(VGA_GC_DATA);
-/* turn off even-odd addressing */
 	outb(VGA_GC_DATA, gc5 & ~0x10);
 
 	outb(VGA_GC_INDEX, 6);
 	gc6 = inb(VGA_GC_DATA);
-/* turn off even-odd addressing */
 	outb(VGA_GC_DATA, gc6 & ~0x02);
-/* write font to plane P4 */
 	set_plane(2);
-/* write font 0 */
 	for(i = 0; i < 256; i++)
 	{
 		vmemwr(16384u * 0 + i * 32, buf, font_height);
 		buf += font_height;
 	}
 #if 0
-/* write font 1 */
 	for(i = 0; i < 256; i++)
 	{
 		vmemwr(16384u * 1 + i * 32, buf, font_height);
 		buf += font_height;
 	}
 #endif
-/* restore registers */
 	outb(VGA_SEQ_INDEX, 2);
 	outb(VGA_SEQ_DATA, seq2);
 	outb(VGA_SEQ_INDEX, 4);
@@ -1041,7 +1030,7 @@ static void write_pixel4p(unsigned x, unsigned y, unsigned c)
 	}
 }*/
 /*****************************************************************************
-*****************************************************************************/
+*****************************************************************************//*
 static void write_pixel8(unsigned x, unsigned y, unsigned c)
 {
 	unsigned wd_in_bytes;
@@ -1051,8 +1040,7 @@ static void write_pixel8(unsigned x, unsigned y, unsigned c)
 	off = wd_in_bytes * y + x;
 	vpokeb(off, c);
 }
-/*****************************************************************************
-*****************************************************************************/
+
 static void write_pixel8x(unsigned x, unsigned y, unsigned c)
 {
 	unsigned wd_in_bytes;
@@ -1063,17 +1051,13 @@ static void write_pixel8x(unsigned x, unsigned y, unsigned c)
 	set_plane(x & 3);
 	vpokeb(off, c);
 }
-/*****************************************************************************
-*****************************************************************************/
 static void draw_x(void)
 {
 	unsigned x, y;
 
-/* clear screen */
 	for(y = 0; y < g_ht; y++)
 		for(x = 0; x < g_wd; x++)
 			g_write_pixel(x, y, 0);
-/* draw 2-color X */
 	for(y = 0; y < g_ht; y++)
 	{
 		g_write_pixel((g_wd - g_ht) / 2 + y, y, 1);
@@ -1081,10 +1065,7 @@ static void draw_x(void)
 	}
 	getch();
 }
-/*****************************************************************************
-READ AND DUMP VGA REGISTER VALUES FOR CURRENT VIDEO MODE
-This is where g_40x25_text[], g_80x50_text[], etc. came from :)
-*****************************************************************************/
+*/
 void dump_state(void)
 {
 	unsigned char state[VGA_NUM_REGS];
@@ -1092,9 +1073,7 @@ void dump_state(void)
 	read_regs(state);
 	dump_regs(state);
 }
-/*****************************************************************************
-SET TEXT MODES
-*****************************************************************************/
+
 void set_text_mode(int hi_res)
 {
 	unsigned rows, cols, ht, i;
@@ -1136,7 +1115,7 @@ void set_text_mode(int hi_res)
 	for(i = 0; i < cols * rows; i++)
 		pokeb(0xB800, i * 2 + 1, 7);
 }
-
+/*
 static unsigned char reverse_bits(unsigned char arg)
 {
 	unsigned char ret_val = 0;
@@ -1158,29 +1137,21 @@ static unsigned char reverse_bits(unsigned char arg)
 	if(arg & 0x80)
 		ret_val |= 0x01;
 	return ret_val;
-}
-
+}*/
+/*
 static void font512(void)
 {
-/* Turbo C++ 1.0 seems to 'lose' any data declared 'static const' */
-	/*static*/ const char msg1[] = "!txet sdrawkcaB";
-	/*static*/ const char msg2[] = "?rorrim a toG";
-/**/
+	const char msg1[] = "!txet sdrawkcaB";
+	const char msg2[] = "?rorrim a toG";
 	unsigned char seq2, seq4, gc4, gc5, gc6;
 	unsigned font_height, i, j;
 
-/* start in 80x25 text mode */
 	set_text_mode(0);
-/* code pasted in from write_font():
-save registers
-set_plane() modifies GC 4 and SEQ 2, so save them as well */
 	outb(VGA_SEQ_INDEX, 2);
 	seq2 = inb(VGA_SEQ_DATA);
 
 	outb(VGA_SEQ_INDEX, 4);
 	seq4 = inb(VGA_SEQ_DATA);
-/* turn off even-odd addressing (set flat addressing)
-assume: chain-4 addressing already off */
 	outb(VGA_SEQ_DATA, seq4 | 0x04);
 
 	outb(VGA_GC_INDEX, 4);
@@ -1188,17 +1159,12 @@ assume: chain-4 addressing already off */
 
 	outb(VGA_GC_INDEX, 5);
 	gc5 = inb(VGA_GC_DATA);
-/* turn off even-odd addressing */
 	outb(VGA_GC_DATA, gc5 & ~0x10);
 
 	outb(VGA_GC_INDEX, 6);
 	gc6 = inb(VGA_GC_DATA);
-/* turn off even-odd addressing */
 	outb(VGA_GC_DATA, gc6 & ~0x02);
-/* write font to plane P4 */
 	set_plane(2);
-/* this is different from write_font():
-use font 1 instead of font 0, and use it for BACKWARD text */
 	font_height = 16;
 	for(i = 0; i < 256; i++)
 	{
@@ -1209,7 +1175,6 @@ use font 1 instead of font 0, and use it for BACKWARD text */
 					g_8x16_font[font_height * i + j]));
 		}
 	}
-/* restore registers */
 	outb(VGA_SEQ_INDEX, 2);
 	outb(VGA_SEQ_DATA, seq2);
 	outb(VGA_SEQ_INDEX, 4);
@@ -1220,16 +1185,11 @@ use font 1 instead of font 0, and use it for BACKWARD text */
 	outb(VGA_GC_DATA, gc5);
 	outb(VGA_GC_INDEX, 6);
 	outb(VGA_GC_DATA, gc6);
-/* now: sacrifice attribute bit b3 (foreground intense color)
-use it to select characters 256-511 in the second font */
 	outb(VGA_SEQ_INDEX, 3);
 	outb(VGA_SEQ_DATA, 4);
-/* xxx - maybe re-program 16-color palette here
-so attribute bit b3 is no longer used for 'intense' */
 	for(i = 0; i < sizeof(msg1); i++)
 	{
 		vpokeb((80 * 8  + 40 + i) * 2 + 0, msg1[i]);
-/* set attribute bit b3 for backward font */
 		vpokeb((80 * 8  + 40 + i) * 2 + 1, 0x0F);
 	}
 	for(i = 0; i < sizeof(msg2); i++)
@@ -1238,3 +1198,4 @@ so attribute bit b3 is no longer used for 'intense' */
 		vpokeb((80 * 16 + 40 + i) * 2 + 1, 0x0F);
 	}
 }
+*/

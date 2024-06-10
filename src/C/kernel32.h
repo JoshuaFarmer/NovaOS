@@ -1,6 +1,16 @@
 #pragma once
 #include <stdint.h>
 
+uint8_t system_user[64];
+bool running = true;
+
+#define setcolor(color) { colour = color }
+void system(const uint16_t* sys);
+
+int abs(int value) {
+	return (value < 0) ? -value : value;
+}
+
 #include "typedef.h"
 #include "io.h"
 #include "terminal.h"
@@ -12,16 +22,6 @@
 #include "emu.h"
 #include "video.h"
 #include "exception.h"
-
-uint8_t* system_user;
-bool running = true;
-
-#define setcolor(color) { colour = color }
-void system(const uint16_t* sys);
-
-int abs(int value) {
-	return (value < 0) ? -value : value;
-}
 
 // Setup VGA buffer. Initialize the VGA frame buffer. (I think - x4exr)
 void clsscr() {

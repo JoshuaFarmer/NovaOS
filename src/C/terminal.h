@@ -284,53 +284,97 @@ void scroll_terminal() {
 	update_cursor(txtx, txty);
 }
 
-error_t printf(const char* format, ...) {
-	int termcolour=colour;
-	va_list args;
-	va_start(args, format);
-	
-	const char* p = format;
-	int tmp=0;
-	while (*p) {
-		if (*p == '%' && *(p + 1)) {
-			p++;
-			switch (*p) {
-				case 'T': {
-					printf("\n%tOUT OF DATE COLOUR FUNCTION\n", VGA_COLOR_LIGHT_RED);
-					break;
-				}
-				case 't': {
-					int x = va_arg(args, int);
-					termcolour = x;
-					break;
-				}
-				case 'c': {
-					char c = (char) va_arg(args, int);
-					putc_coloured(c,termcolour);
-					break;
-				}
-				case 'd': {
-					int i = va_arg(args, int);
-					print_int(i, termcolour);
-					break;
-				}
-				case 's': {
-					const char* str = va_arg(args, const char*);
-					puts_coloured(str,termcolour);
-					break;
-				}
-				default: {
-					putc_coloured('%',termcolour);
-					putc_coloured(*p,termcolour);
-					break;
-				}
-			}
-		} else {
-			putc_coloured(*p,termcolour);
-		}
-		p++;
-	}
+void itoa(int value, char* str, int base) {
+ 	char* ptr=str;
+ 	char* low;
+ 	
+ 	// Check for valid base
+ 	if (base < 2 || base > 36) {
+ 	 	*str = '\0';
+ 	 	return;
+ 	}
+ 	
+ 	// Set '-' for negative decimals
+ 	if (value < 0 && base == 10) {
+ 	 	*ptr++ = '-';
+ 	}
+ 	
+ 	low = ptr;
+ 	
+ 	// Digits in reverse order
+ 	do {
+ 	 	*ptr++ = "0123456789abcdefghijklmnopqrstuvwxyz"[abs(value % base)];
+ 	 	value /= base;
+ 	} while (value);
+ 	
+ 	// Terminate string in ptr
+ 	*ptr-- = '\0';
+ 	
+ 	// Reverse the string
+ 	while (low < ptr) {
+ 	 	char tmp = *low;
+ 	 	*low++ = *ptr;
+ 	 	*ptr-- = tmp;
+ 	}
+}
 
-	va_end(args);
-	return 0; // Assuming 0 is success for error_t
+void print_hex(int value, int colour) {
+ 	char buffer[9]; // Enough to hold "FFFFFFFF\0"
+ 	itoa(value, buffer, 16); // Convert integer to hexadecimal string
+ 	puts_coloured(buffer, colour);
+}
+
+error_t printf(const char* format, ...) {
+	int termcolour = colour;
+ 	va_list args;
+ 	va_start(args, format);
+ 	
+ 	const char* p = format;
+ 	while (*p) {
+ 	 	if (*p == '%' && *(p + 1)) {
+ 	 	 	p++;
+ 	 	 	switch (*p) {
+ 	 	 	 	case 'T': {
+ 	 	 	 	 	printf("\n%tOUT OF DATE COLOUR FUNCTION\n", VGA_COLOR_LIGHT_RED);
+ 	 	 	 	 	break;
+ 	 	 	 	}
+ 	 	 	 	case 't': {
+ 	 	 	 	 	int x = va_arg(args, int);
+ 	 	 	 	 	termcolour = x;
+ 	 	 	 	 	break;
+ 	 	 	 	}
+ 	 	 	 	case 'c': {
+ 	 	 	 	 	char c = (char) va_arg(args, int);
+ 	 	 	 	 	putc_coloured(c, termcolour);
+ 	 	 	 	 	break;
+ 	 	 	 	}
+ 	 	 	 	case 'd': {
+ 	 	 	 	 	int i = va_arg(args, int);
+ 	 	 	 	 	print_int(i, termcolour);
+ 	 	 	 	 	break;
+ 	 	 	 	}
+ 	 	 	 	case 's': {
+ 	 	 	 	 	const char* str = va_arg(args, const char*);
+ 	 	 	 	 	puts_coloured(str, termcolour);
+ 	 	 	 	 	break;
+ 	 	 	 	}
+ 	 	 	 	case 'x': {
+ 	 	 	 	 	int i = va_arg(args, int);
+ 	 	 	 	 	print_hex(i, termcolour);
+ 	 	 	 	 	break;
+ 	 	 	 	}
+ 	 	 	 	default: {
+ 	 	 	 	 	putc_coloured('%', termcolour);
+ 	 	 	 	 	putc_coloured(*p, termcolour);
+ 	 	 	 	 	break;
+ 	 	 	 	}
+ 	 	 	}
+ 	 	} else {
+ 	 	 	putc_coloured(*p, termcolour);
+ 	 	}
+ 	 	p++;
+ 	}
+
+ 	va_end(args);
+ 	return 0; // Assuming 0 is success for error_t
 }
