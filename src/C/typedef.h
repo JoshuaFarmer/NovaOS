@@ -22,22 +22,6 @@ enum vga_color {
 	VGA_COLOR_WHITE = 15,
 };
 
-typedef struct {
-	char drivetype;
-	short sectors;
-	short cylinders;
-	char heads;
-	char drives;
-} disk_info;
-
-typedef struct {
-	char bl;
-	char ch;
-	char cl;
-	char dh;
-	char dl;
-} raw_disk_info;
-
 #define vgabuff 0xA0000
 #define videobuff 0xB8000
 #define KEYBOARD_STATUS_PORT 0x64
