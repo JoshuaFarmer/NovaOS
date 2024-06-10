@@ -11,9 +11,16 @@ int abs(int value) {
 	return (value < 0) ? -value : value;
 }
 
+#include "math.h"
 #include "typedef.h"
 #include "io.h"
 #include "terminal.h"
+
+void syserr(const char* s) {
+	printf("%t%s%t\n", VGA_COLOR_LIGHT_RED,s,colour);
+	while(1);
+}
+
 #include "string.h"
 #include "memory.h"
 #include "malloc.h"

@@ -12,7 +12,7 @@ void kernel_main() {
 	init();
 	// init_heap();
 	init_pit();
-	beep(650, 500);
+	beep(440, 1000);
 
 	// ignore for now
 	set_text_mode(1);
