@@ -2,7 +2,7 @@ simple 32 bit operating system. <br>
 Todo: <br>
 finish EXT-2<br>
 simple elf loading<br>
-simpле window mngr<br>
+simple window mngr<br>
 
 <h1>RANDOM STUFF</h1>
 <p>
