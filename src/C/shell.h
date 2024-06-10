@@ -80,7 +80,6 @@ void system(const uint16_t* sys) {
 	}
 
 	else if (strcmp(cmd[0], "txtmode") == 0) {
-		text_editor();
 		if (strcmp(cmd[1], "") == 0) {return;}
 		else if (strcmp(cmd[1], "-80x25") == 0) {
 			set_text_mode(0);
@@ -91,6 +90,9 @@ void system(const uint16_t* sys) {
 			VGA_WIDTH = 90;
 			VGA_HEIGHT = 60;
 		}
+		clsscr();
+		txtx = 0;
+		txty = 0;
 	}
 
 	else if (strcmp(cmd[0], "") == 0) {}

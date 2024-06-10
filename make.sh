@@ -25,14 +25,10 @@ if grub-file --is-x86-multiboot bin/Nova.bin; then
     # Create the ISO image
     grub-mkrescue -o bin/Nova.iso isodir
 
-    # Create a 512MB raw disk image
-    dd if=/dev/zero of=bin/Nova_512MB.img bs=1M count=512
-
-    # Write the ISO contents into the raw disk image
-    dd if=bin/Nova.iso of=bin/Nova_512MB.img conv=notrunc
+	qemu-img convert -O qcow2 bin/Nova.iso bin/Nova.qcow2
 
     # Optionally run the OS in QEMU
-    # qemu-system-x86_64 -m 256m -soundhw pcspk -debugcon stdio -drive file=bin/Nova_512MB.img,index=0,if=ide,format=raw
+    qemu-system-x86_64 -m 256m -soundhw pcspk -debugcon stdio -drive file=bin/Nova.qcow2,index=0,if=ide,format=qcow2
 else
     echo "The file is not multiboot"
 fi
