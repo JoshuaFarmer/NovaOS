@@ -1,6 +1,7 @@
 #pragma once
 #include "typedef.h"
 #include "Kernel/memory.h"
+#include "Kernel/video.h"
 #include "GUI/NovaGUI.h"
 
 void text_editor() {
@@ -91,11 +92,11 @@ void system(const uint16_t* sys) {
 	else if (strcmp(cmd[0], "txtmode") == 0) {
 		if (strcmp(cmd[1], "") == 0) {return;}
 		else if (strcmp(cmd[1], "-80x25") == 0) {
-			//set_text_mode(0);
+			set_text_mode(0);
 			VGA_WIDTH = 80;
 			VGA_HEIGHT = 25;
 		} else if (strcmp(cmd[1], "-90x60") == 0) {
-			//set_text_mode(1);
+			set_text_mode(1);
 			VGA_WIDTH = 90;
 			VGA_HEIGHT = 60;
 		}

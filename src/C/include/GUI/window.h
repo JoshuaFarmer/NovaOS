@@ -186,7 +186,7 @@ void window_mngr(windows_t* windows) {
 				if (active_window != NULL && moving) active_window->y += mouses;
 				if (active_window != NULL && resize) {active_window->h += mouses; if (active_window->h < MIN_WIN_H) {active_window->h = MIN_WIN_H; moving = false; resize = false; active_window = NULL; } }
 				redraw = true; break;
-			case KEY_INTERACT: {
+			case KEY_INS: {
 				handle_drag(windows, mousex, mousey);
 				handle_resize(windows, mousex, mousey);
 				handle_close(windows, mousex, mousey);

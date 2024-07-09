@@ -1,3 +1,4 @@
+#pragma once
 #define	peekb(S,O)		*(unsigned char *)(16uL * (S) + (O))
 #define	pokeb(S,O,V)		*(unsigned char *)(16uL * (S) + (O)) = (V)
 #define	pokew(S,O,V)		*(unsigned short *)(16uL * (S) + (O)) = (V)
