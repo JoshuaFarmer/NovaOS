@@ -20,12 +20,12 @@ void system(const uint16_t* sys);
 
 #include "Kernel/string.h"
 #include "Kernel/malloc.h"
-//#include "ata.h"
-//#include "diskio.h"
+//#include "Kernel/ata.h"
+//#include "Kernel/diskio.h"
 //#include "ff.h"
 //#include "ffconf.h"
 
 //#include "emu.h"
-//#include "video.h"
+#include "Kernel/video.h"
 
 // Setup VGA buffer. Initialize the VGA frame buffer. (I think - x4exr)
