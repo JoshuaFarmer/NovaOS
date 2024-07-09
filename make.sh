@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # Find all .c and .h files and count lines
-find . \( -name '*.c' -or -name '*.h' \) -print0 | xargs -0 wc -l
+# find . \( -name '*.c' -or -name '*.h' \) -print0 | xargs -0 wc -l
 
 # Compile assembly and C source files
 clang -m32 -c "src/asm/boot.s" -o "bin/boot.o" -march=i386
 nasm  -f elf32 "src/asm/interrupts.asm" -o "bin/interrupts.o"
 # kernel
-clang -m32 -c -ffreestanding "src/C/kernel/kernel32.c" -o "bin/krnl32.o" -Wall -Wextra -Werror -march=i386 -I src/C/include
+clang -m32 -c -ffreestanding "src/C/kernel32.c" -o "bin/krnl32.o" -Wall -Wextra -Werror -march=i386 -I src/C/include
 
 # FS
 #clang -m32 -c -ffreestanding "src/C/kernel/diskio.c" -o "bin/diskio.o" -Wall -Wextra -march=i386 -I src/C/include
