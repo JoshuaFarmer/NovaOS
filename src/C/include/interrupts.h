@@ -68,8 +68,10 @@ void init_gdt() {
 	gdtp.base = (uint32_t)&gdt;
 
 	set_gdt_entry(0, 0, 0, 0, 0);				// Null segment
-	set_gdt_entry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Code segment
-	set_gdt_entry(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Data segment
+	set_gdt_entry(1, 0, 0xFFFFFFFF, 0x9A, 0xCF); // Kernel code segment
+	set_gdt_entry(2, 0, 0xFFFFFFFF, 0x92, 0xCF); // Kernel data segment
+	//set_gdt_entry(3, 0, 0xFFFFFFFF, 0xFA, 0xCF); // User code segment
+	//set_gdt_entry(4, 0, 0xFFFFFFFF, 0xF2, 0xCF); // User data segment
 
 	asm volatile("lgdt (%0)" : : "r" (&gdtp));
 	asm volatile("movl $0x10, %%eax; \

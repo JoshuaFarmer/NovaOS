@@ -12,9 +12,9 @@ void init(void) {
 void kernel_main() {
 	init();
 
-	init_pic();
 	init_gdt();
 	init_idt();
+	init_pic();
 
 	init_heap();
 	init_pit(12);

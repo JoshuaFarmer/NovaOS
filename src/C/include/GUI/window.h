@@ -225,6 +225,13 @@ void window_mngr0() {
 		}
 
 		handle_updates(GUIWindows);
+	}
+}
+
+void window_mngr(windows_t* wins) {
+	GUIWindows = wins;
+	windowmngr = true;
+	while (true) {
 		switch (getch()) {
 			case KEY_LE:
 				mousex-=mouses;
@@ -255,12 +262,6 @@ void window_mngr0() {
 			}
 		}
 	}
-}
-
-void window_mngr(windows_t* wins) {
-	GUIWindows = wins;
-	windowmngr = true;
-	while (true) {}
 }
 
 void init_graphics() {
