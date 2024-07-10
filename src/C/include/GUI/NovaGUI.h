@@ -16,10 +16,6 @@ int example_main(void* ptr) {
 }
 
 void example_update(void* ptr) {
-	if (ptr == NULL) return;
-	window_t* win = (window_t*)ptr;
-	wstrcpy(win->elements[0]->text, L"TEST #2");
-	win->elements[0]->x++;
 	return;
 }
 
