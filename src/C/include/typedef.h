@@ -173,6 +173,8 @@ typedef struct {
 	size_t idx;
 
 	int  (*Main)(void*); // passed value is window ptr
+	bool_t main_ran;
+	
 	void (*Update)(void*);
 } window_t;
 

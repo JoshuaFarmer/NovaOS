@@ -2,6 +2,8 @@
 #include "typedef.h"
 #include "pit.h"
 
+void window_mngr0();
+
 struct idt_entry {
 	uint16_t base_low;	 // Lower 16 bits of the handler address
 	uint16_t selector;	 // Kernel segment selector
@@ -92,6 +94,7 @@ void system_interrupt80() {
 
 void system_interrupt0() {
 	outb(PIC1_COMMAND, 0x20);
+	window_mngr0();
 }
 
 void default_exception() {

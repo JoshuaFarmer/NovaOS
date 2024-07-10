@@ -8,16 +8,19 @@ static uint8_t mouses = 2;
 static bool_t resize=false;
 static bool_t moving=false;
 
+static bool_t windowmngr=false;
+
 window_t* active_window = NULL;
+windows_t* GUIWindows = &windows;
 
 int add_window(window_t* window) {
 	// find the first empty element
 	int i=0;
-	for (i = 0; windows.windows[i] != NULL && i < MAX_WINDOW_COUNT+1; ++i);
+	for (i = 0; GUIWindows->windows[i] != NULL && i < MAX_WINDOW_COUNT+1; ++i);
 	if(i==MAX_WINDOW_COUNT)return -1;
 
 	window->idx = i;
-	windows.windows[i] = window;
+	GUIWindows->windows[i] = window;
 	return 0;
 }
 
@@ -83,63 +86,63 @@ void drawWindow(window_t* window) {
 	}
 }
 
-window_t* find_window(windows_t* windows, uint32_t x, uint32_t y) {
+window_t* find_window(windows_t* GUIWindows, uint32_t x, uint32_t y) {
 	for (size_t i = 0; i < MAX_WINDOW_COUNT; ++i) {
-		if (x >= windows->windows[i]->x && x < windows->windows[i]->x + windows->windows[i]->w &&
-			y >= windows->windows[i]->y && y < windows->windows[i]->y + windows->windows[i]->h) {
+		if (x >= GUIWindows->windows[i]->x && x < GUIWindows->windows[i]->x + GUIWindows->windows[i]->w &&
+			y >= GUIWindows->windows[i]->y && y < GUIWindows->windows[i]->y + GUIWindows->windows[i]->h) {
 
-			return windows->windows[i];
+			return GUIWindows->windows[i];
 		}
 	}
 
 	return NULL;
 }
 
-window_t* handle_drag(windows_t* windows, uint32_t x, uint32_t y) {
+window_t* handle_drag(windows_t* GUIWindows, uint32_t x, uint32_t y) {
 	for (size_t i = 0; i < MAX_WINDOW_COUNT; ++i) {
-		if (x >= windows->windows[i]->x && x < windows->windows[i]->x + windows->windows[i]->w - CLOSE_BUTTON_SIZE - 5 &&
-			y >= windows->windows[i]->y && y < windows->windows[i]->y + CONTROL_HEIGHT) {
+		if (x >= GUIWindows->windows[i]->x && x < GUIWindows->windows[i]->x + GUIWindows->windows[i]->w - CLOSE_BUTTON_SIZE - 5 &&
+			y >= GUIWindows->windows[i]->y && y < GUIWindows->windows[i]->y + CONTROL_HEIGHT) {
 
-			active_window = (active_window == NULL) ? windows->windows[i] : NULL;
+			active_window = (active_window == NULL) ? GUIWindows->windows[i] : NULL;
 			moving = !moving;
-			return windows->windows[i];
+			return GUIWindows->windows[i];
 		}
 	}
 
 	return NULL;
 }
 
-window_t* handle_resize(windows_t* windows, uint32_t x, uint32_t y) {
+window_t* handle_resize(windows_t* GUIWindows, uint32_t x, uint32_t y) {
 	for (size_t i = 0; i < MAX_WINDOW_COUNT; ++i) {
-		if (x >= windows->windows[i]->x + windows->windows[i]->w - 5 && x < windows->windows[i]->x + windows->windows[i]->w &&
-			y >= windows->windows[i]->y + windows->windows[i]->h - 5 && y < windows->windows[i]->y + windows->windows[i]->h) {
+		if (x >= GUIWindows->windows[i]->x + GUIWindows->windows[i]->w - 5 && x < GUIWindows->windows[i]->x + GUIWindows->windows[i]->w &&
+			y >= GUIWindows->windows[i]->y + GUIWindows->windows[i]->h - 5 && y < GUIWindows->windows[i]->y + GUIWindows->windows[i]->h) {
 
-			active_window = active_window == NULL ? windows->windows[i] : NULL;
+			active_window = active_window == NULL ? GUIWindows->windows[i] : NULL;
 			resize = !resize;
-			return windows->windows[i];
+			return GUIWindows->windows[i];
 		}
 	}
 
 	return NULL;
 }
 
-window_t* handle_close(windows_t* windows, uint32_t x, uint32_t y) {
+window_t* handle_close(windows_t* GUIWindows, uint32_t x, uint32_t y) {
 	for (size_t i = 0; i < MAX_WINDOW_COUNT; ++i) {
-		if (x >= windows->windows[i]->x + windows->windows[i]->w - CLOSE_BUTTON_SIZE - WIN_MARGIN && x < windows->windows[i]->x + windows->windows[i]->w - WIN_MARGIN &&
-			y >= windows->windows[i]->y + WIN_MARGIN && y < windows->windows[i]->y + CLOSE_BUTTON_SIZE + WIN_MARGIN) {
+		if (x >= GUIWindows->windows[i]->x + GUIWindows->windows[i]->w - CLOSE_BUTTON_SIZE - WIN_MARGIN && x < GUIWindows->windows[i]->x + GUIWindows->windows[i]->w - WIN_MARGIN &&
+			y >= GUIWindows->windows[i]->y + WIN_MARGIN && y < GUIWindows->windows[i]->y + CLOSE_BUTTON_SIZE + WIN_MARGIN) {
 
-			free((byte_t*)windows->windows[i]);
-			windows->windows[i] = (window_t*)NULL;
+			free((byte_t*)GUIWindows->windows[i]);
+			GUIWindows->windows[i] = (window_t*)NULL;
 			redraw = true;
-			return windows->windows[i];
+			return GUIWindows->windows[i];
 		}
 	}
 
 	return NULL;
 }
 
-element_t* handle_elems(windows_t* windows, uint32_t x, uint32_t y) {
-	window_t* win = find_window(windows, x, y);
+element_t* handle_elems(windows_t* GUIWindows, uint32_t x, uint32_t y) {
+	window_t* win = find_window(GUIWindows, x, y);
 
 	if (!win) return NULL;
 
@@ -161,14 +164,20 @@ element_t* handle_elems(windows_t* windows, uint32_t x, uint32_t y) {
 	return NULL;
 }
 
-void handle_updates(windows_t* windows) {
+void handle_updates(windows_t* GUIWindows) {
 	for (size_t i = 0; i < MAX_WINDOW_COUNT; ++i) {
-		if (windows->windows[i] != NULL)
-			windows->windows[i]->Update(windows->windows[i]);
+		if (GUIWindows->windows[i] != NULL) {
+			if (GUIWindows->windows[i]->main_ran == false) {
+				GUIWindows->windows[i]->main_ran = false;
+				GUIWindows->windows[i]->Main(GUIWindows->windows[i]);
+			}
+			GUIWindows->windows[i]->Update(GUIWindows->windows[i]);
+		}
 	}
 }
 
 window_t* init_window(int w, int h, wchar_t name[], int (*Main)(void*), void (*Update)(void*)) {
+	if (Main == NULL || Update == NULL) return NULL;
 	window_t* win = malloc(sizeof(window_t));
 	win->w = w;
 	win->h = h;
@@ -176,10 +185,10 @@ window_t* init_window(int w, int h, wchar_t name[], int (*Main)(void*), void (*U
 	win->y = 10;
 	win->Main = Main;
 	win->Update = Update;
+	win->main_ran = false;
 
 	wstrcpy(win->name, name);
 
-	win->Main(win);
 	return win;
 }
 
@@ -192,13 +201,13 @@ void draw_bg(byte_t* membuff, byte_t* data) {
 	}
 }
 
-void window_mngr(windows_t* windows) {
-	while (true) {
+void window_mngr0() {
+	if (windowmngr) {
 		if (redraw) {
 			memset(membuff, DESKTOP_C, 320*200);
 			for (size_t i = 0; i < MAX_WINDOW_COUNT; ++i) {
-				if (windows->windows[i])
-					drawWindow(windows->windows[i]);
+				if (GUIWindows->windows[i])
+					drawWindow(GUIWindows->windows[i]);
 				if (active_window) drawWindow(active_window);
 			}
 
@@ -215,7 +224,7 @@ void window_mngr(windows_t* windows) {
 			redraw = false;
 		}
 
-		handle_updates(windows);
+		handle_updates(GUIWindows);
 		switch (getch()) {
 			case KEY_LE:
 				mousex-=mouses;
@@ -226,7 +235,7 @@ void window_mngr(windows_t* windows) {
 				mousex+=mouses;
 				if (active_window != NULL && moving) active_window->x += mouses;
 				if (active_window != NULL && resize) {active_window->w += mouses; if (active_window->w < MIN_WIN_W) {active_window->w = MIN_WIN_W; moving = false; resize = false; active_window = NULL; } }
-				redraw = true; break;
+					redraw = true; break;
 			case KEY_UP:
 				mousey-=mouses;
 				if (active_window != NULL && moving) active_window->y -= mouses;
@@ -238,14 +247,20 @@ void window_mngr(windows_t* windows) {
 				if (active_window != NULL && resize) {active_window->h += mouses; if (active_window->h < MIN_WIN_H) {active_window->h = MIN_WIN_H; moving = false; resize = false; active_window = NULL; } }
 				redraw = true; break;
 			case KEY_INS: {
-				handle_drag(windows, mousex, mousey);
-				handle_resize(windows, mousex, mousey);
-				handle_close(windows, mousex, mousey);
-				handle_elems(windows, mousex, mousey);
+				handle_drag(GUIWindows, mousex, mousey);
+				handle_resize(GUIWindows, mousex, mousey);
+				handle_close(GUIWindows, mousex, mousey);
+				handle_elems(GUIWindows, mousex, mousey);
 				break;
 			}
 		}
 	}
+}
+
+void window_mngr(windows_t* wins) {
+	GUIWindows = wins;
+	windowmngr = true;
+	while (true) {}
 }
 
 void init_graphics() {
