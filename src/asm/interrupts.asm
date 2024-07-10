@@ -1,13 +1,35 @@
-global SYSIN80
+global system_interrupt80_handler
+global system_interrupt0_handler
+global keyboard_interrupt_handler
 global default_exception_handler
 
-extern SYS80
+extern system_interrupt80
+extern system_interrupt0
+extern default_exception
+extern getc
+
 extern add_window
 extern create_text_element
 
 section .text
 
-SYSIN80:
+keyboard_interrupt_handler:
+	cli
+	pusha
+	call getc
+	popa
+	sti
+	iret
+
+system_interrupt0_handler:
+	cli
+	pusha
+	call system_interrupt0
+	popa
+	sti
+	iret
+
+system_interrupt80_handler:
 	cli
 	pusha
 
@@ -23,7 +45,7 @@ SYSIN80:
 	sti
 	iret
 .none:
-	call SYS80
+	call system_interrupt80
 	jmp .exit
 .createwindow:
 	mov edx, ebx
@@ -38,9 +60,10 @@ SYSIN80:
 	add esp, 16
 	jmp .exit
 
-
 default_exception_handler:
 	cli
-	hlt
-	jmp $
+	pusha
+	call default_exception
+	popa
+	sti
 	iret

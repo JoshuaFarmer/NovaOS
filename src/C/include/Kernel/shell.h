@@ -115,8 +115,9 @@ void system(const uint16_t* sys) {
 }
 
 void txtshell(uint8_t* system_user, uint8_t* current_dir, uint16_t* kbdbuf) {
+	sti();
+
 	while (running) {
-		// hahahhahahahahahahaha
 		printf("%t%s%t@%t%s", VGA_COLOR_LIGHT_BLUE, system_user, VGA_COLOR_LIGHT_GREY, VGA_COLOR_RED, current_dir);
 		gets((uint16_t*)kbdbuf, 128);
 

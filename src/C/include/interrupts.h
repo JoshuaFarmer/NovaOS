@@ -1,5 +1,6 @@
 #pragma once
 #include "typedef.h"
+#include "pit.h"
 
 struct idt_entry {
 	uint16_t base_low;	 // Lower 16 bits of the handler address
@@ -79,19 +80,33 @@ void init_gdt() {
 			  flush:" : : : "memory");
 }
 
-extern void SYSIN80();
+extern void system_interrupt80_handler();
+extern void system_interrupt0_handler();
+extern void keyboard_interrupt_handler();
+extern void default_exception_handler();
 
-void SYS80() {
+void system_interrupt80() {
 	draw_text(membuff, L"INTERRUPT 0x80 CALLED", 0, 0, 255);
 	debug_print("INT 0x80 CALLED\n");
 }
 
-extern void default_exception_handler();
+void system_interrupt0() {
+	outb(PIC1_COMMAND, 0x20);
+}
+
+void default_exception() {
+	printf("EXCEPTION ERROR\n");
+}
 
 void init_idt() {
 	for (int i = 0; i < IDT_ENTRIES; i++) {
 		set_idt_entry(i, (uint32_t)default_exception_handler);
 	}
-	set_idt_entry(0x80, (uint32_t)SYSIN80);
+
+	set_idt_entry(0x80, (uint32_t)system_interrupt80_handler);
+	set_idt_entry(0x20, (uint32_t)system_interrupt0_handler);
+	set_idt_entry(0x21, (uint32_t)keyboard_interrupt_handler); // mostly unused
+
 	load_idt();
+	printf("IDT LOADED\n");
 }

@@ -30,10 +30,6 @@ void beep(uint32_t pitch, uint32_t ms) {
 	shutup();
 }
 
-void init_pit() {
-	outb(0x36, PIT_COMMAND_PORT); // Set command byte: channel 0, mode 3, binary counter
-}
-
 void wait_ms(unsigned int milliseconds) {
 	unsigned int count = 11932 * milliseconds; // PIT frequency is approximately 11932 Hz
 

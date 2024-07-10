@@ -73,10 +73,26 @@ void drawWindow(window_t* window) {
 					draw_bitmap_element(membuff, window, elem);
 				}
 
+				case elembutton: {
+					draw_button_element(membuff, window, elem);
+				}
+
 				default: {break;}
 			}
 		}
 	}
+}
+
+window_t* find_window(windows_t* windows, uint32_t x, uint32_t y) {
+	for (size_t i = 0; i < MAX_WINDOW_COUNT; ++i) {
+		if (x >= windows->windows[i]->x && x < windows->windows[i]->x + windows->windows[i]->w &&
+			y >= windows->windows[i]->y && y < windows->windows[i]->y + windows->windows[i]->h) {
+
+			return windows->windows[i];
+		}
+	}
+
+	return NULL;
 }
 
 window_t* handle_drag(windows_t* windows, uint32_t x, uint32_t y) {
@@ -122,14 +138,48 @@ window_t* handle_close(windows_t* windows, uint32_t x, uint32_t y) {
 	return NULL;
 }
 
-window_t* init_window(int w, int h, wchar_t name[]) {
+element_t* handle_elems(windows_t* windows, uint32_t x, uint32_t y) {
+	window_t* win = find_window(windows, x, y);
+
+	if (!win) return NULL;
+
+	for (size_t i = 0; i < MAX_ELEMENT_COUNT; ++i) {
+		element_t* elem = win->elements[i];
+		if (!elem) continue;
+
+		if (elem->type != elembutton) continue;
+		
+		if (x >= win->x + elem->x && x < win->x + elem->x + ((button_t*)elem->data.raw)->w &&
+			y >= win->y + elem->y && y < win->y + elem->y + ((button_t*)elem->data.raw)->h + CONTROL_HEIGHT) {
+			
+			((button_t*)elem->data.raw)->onClick((void*)win, (void*)elem);
+			redraw = true;
+			return elem;
+		}
+	}
+
+	return NULL;
+}
+
+void handle_updates(windows_t* windows) {
+	for (size_t i = 0; i < MAX_WINDOW_COUNT; ++i) {
+		if (windows->windows[i] != NULL)
+			windows->windows[i]->Update(windows->windows[i]);
+	}
+}
+
+window_t* init_window(int w, int h, wchar_t name[], int (*Main)(void*), void (*Update)(void*)) {
 	window_t* win = malloc(sizeof(window_t));
 	win->w = w;
 	win->h = h;
 	win->x = 10;
 	win->y = 10;
-	
+	win->Main = Main;
+	win->Update = Update;
+
 	wstrcpy(win->name, name);
+
+	win->Main(win);
 	return win;
 }
 
@@ -165,6 +215,7 @@ void window_mngr(windows_t* windows) {
 			redraw = false;
 		}
 
+		handle_updates(windows);
 		switch (getch()) {
 			case KEY_LE:
 				mousex-=mouses;
@@ -190,6 +241,7 @@ void window_mngr(windows_t* windows) {
 				handle_drag(windows, mousex, mousey);
 				handle_resize(windows, mousex, mousey);
 				handle_close(windows, mousex, mousey);
+				handle_elems(windows, mousex, mousey);
 				break;
 			}
 		}
@@ -200,13 +252,13 @@ void init_graphics() {
 	current_buffer = membuff;
 
 	/* Initialize terminal interface */
-	VGAMode(3, GVGA_WIDTH, GVGA_HEIGHT,1); // Set VGA mode to 320x200 with 256 colors
+	VGAMode(3, GVGA_WIDTH, GVGA_HEIGHT,1); // Set VGA mode to 320x200 with 256 Colours
 
-	// Define the palette array for 256 colors
+	// Define the palette array for 256 Colours
 	char PAL256[256 * 3];
 	size_t x = 0;
 
-	// Create a color palette for the first 240 colors
+	// Create a Colour palette for the first 240 Colours
 	for (int r = 0; r < 8; ++r) {
 		for (int g = 0; g < 8; ++g) {
 			for (int b = 0; b < 4; ++b) {
@@ -219,7 +271,7 @@ void init_graphics() {
 		}
 	}
 
-	// Create a grayscale palette for the last 16 colors
+	// Create a grayscale palette for the last 16 Colours
 	for (int i = 0; i < 16; ++i) {
 		unsigned char gray = (i * 4);
 		PAL256[x++] = gray; // Red component

@@ -85,7 +85,9 @@ typedef uint32_t FSIZE_t;
 
 byte_t* current_buffer=(byte_t*)0xA0000;
 
-enum vga_color {
+#define vga_color vga_colour
+
+enum vga_colour {
 	VGA_COLOR_BLACK = 0,
 	VGA_COLOR_BLUE = 1,
 	VGA_COLOR_GREEN = 2,
@@ -130,12 +132,18 @@ typedef enum uint32_t {
 	elemtext,
 	elembitmap,
 	elembutton,
+	elemtextbox,
 } element_type_t;
 
 typedef struct {
 	byte_t*  data;
 	uint16_t w,h;
 } image_t;
+
+typedef struct {
+	void (*onClick)(void*,void*);
+	uint16_t w,h;
+} button_t;
 
 typedef struct {
 	byte_t* raw;
@@ -163,6 +171,9 @@ typedef struct {
 	element_t* elements[MAX_ELEMENT_COUNT];
 
 	size_t idx;
+
+	int  (*Main)(void*); // passed value is window ptr
+	void (*Update)(void*);
 } window_t;
 
 typedef struct {
@@ -172,8 +183,8 @@ typedef struct {
 windows_t windows;
 byte_t membuff[GVGA_WIDTH*GVGA_HEIGHT];
 
-void draw_text(byte_t* membuff, wchar_t* s, int x, int y, int color);
-void draw_textw(byte_t* membuff, window_t* win, wchar_t* s, uint32_t x, uint32_t y, int color, int xmar, bool_t wrap);
+void draw_text(byte_t* membuff, wchar_t* s, int x, int y, int colour);
+void draw_textw(byte_t* membuff, window_t* win, wchar_t* s, uint32_t x, uint32_t y, int colour, int xmar, bool_t wrap);
 void draw_text_element(byte_t* membuff, window_t* win, element_t* elem);
 element_t* create_text_element(window_t* win, wchar_t* text, uint16_t x, uint16_t y);
 void remove_text_element(window_t* win, element_t* elem);

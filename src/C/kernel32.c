@@ -12,11 +12,13 @@ void init(void) {
 void kernel_main() {
 	init();
 
+	init_pic();
 	init_gdt();
 	init_idt();
 
 	init_heap();
-	init_pit();
+	init_pit(12);
+
 	beep(440, 500);
 
 	set_text_mode(1);
@@ -41,7 +43,7 @@ void kernel_main() {
 	size_t heap_size = remaining_heap_space();
 	printf("%theap size: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,HEAP_CAP);
 	printf("%tremaining heap space: %t%d\n", VGA_COLOR_LIGHT_GREEN,VGA_COLOR_WHITE,heap_size);
-
+	
 	txtshell((uint8_t*)system_user,(uint8_t*)current_dir,(uint16_t*)kbdbuf);
 
 	outw(0x604,0x2000); // qemu only iirc

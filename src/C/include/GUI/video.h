@@ -51,20 +51,20 @@
 #define VGA__GCT_DATA 0x3cf    //graphics controller, data
 #define VGA__GCT__WRV 0        //graphics controller, write value
 #define VGA__GCT__WRS 1        //graphics controller, write selection
-#define VGA__GCT__COC 2        //graphics controller, color compare
+#define VGA__GCT__COC 2        //graphics controller, Colour compare
 #define VGA__GCT__DRO 3        //graphics controller, data rotate
 #define VGA__GCT__RDM 4        //graphics controller, read map
 #define VGA__GCT__GMO 5        //graphics controller, graphics mode
 #define VGA__GCT__MIS 6        //graphics controller, miscelaneous
-#define VGA__GCT__CSE 7        //graphics controller, color selection
+#define VGA__GCT__CSE 7        //graphics controller, Colour selection
 #define VGA__GCT__BIT 8        //graphics controller, bit mask
 #define VGA__ACT_ADDA 0x3c0    //attribute controller, address and data
 #define VGA__ACT_READ 0x3c1    //attribute controller, read
 #define VGA__ACT__ATB 16       //attribute controller, attributes
-#define VGA__ACT__BOR 17       //attribute controller, border color
+#define VGA__ACT__BOR 17       //attribute controller, border Colour
 #define VGA__ACT__PEN 18       //attribute controller, plane enable
 #define VGA__ACT__OFF 19       //attribute controller, offset
-#define VGA__ACT__CSE 20       //attribute controller, color selection
+#define VGA__ACT__CSE 20       //attribute controller, Colour selection
 #define VGA__DAC_ADDR_R 0x3c7  //pallete, read address
 #define VGA__DAC_ADDR_W 0x3c8  //pallete, write address
 #define VGA__DAC_DATA 0x3c9    //pallete, data
@@ -317,9 +317,9 @@ void setfontplane(void)
 }
 
 //modifies the VGA pallete
-//pal=pointer to the first pallete color to be used
-//first=first color to modify
-//num=number of colors to modify
+//pal=pointer to the first pallete Colour to be used
+//first=first Colour to modify
+//num=number of Colours to modify
 void VGASetPal(char*pal,char first,short num)
 {
 	if((num+first)>256)num=256-first;
@@ -334,9 +334,9 @@ void VGASetPal(char*pal,char first,short num)
 }
 
 //obtains the VGA pallete
-//pal=pointer to the first pallete color to be overwritten
-//first=first color to read
-//num=number of colors to read
+//pal=pointer to the first pallete Colour to be overwritten
+//first=first Colour to read
+//num=number of Colours to read
 void VGAGetPal(char*pal,char first,short num)
 {
 	if((num+first)>256)num=256-first;
@@ -466,8 +466,8 @@ void VGAWaitVBL(void)
 //m=mode
 //  0=text (8-pixels-wide characters)
 //  1=text (9-pixels-wide characters)
-//  2=graphics 16 colors
-//  3=graphics 256 colors
+//  2=graphics 16 Colours
+//  3=graphics 256 Colours
 //w=width (in characters or in pixels)
 //h=height (in characters or in pixels)
 //o=option
@@ -489,7 +489,7 @@ void VGAWaitVBL(void)
 //graphic mode widths (16c): 640, 720
 //graphic mode widths (256c): 320, 360
 //graphic mode heights: 200, 240, 350, 400, 480
-//chained mode only allows 320*200 at 256 colors
+//chained mode only allows 320*200 at 256 Colours
 char VGAMode(char m,short w,short h,char o)
 {
 	char*tbl_hor,*tbl_ver,*tbl_mod;

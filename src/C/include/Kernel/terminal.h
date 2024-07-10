@@ -67,6 +67,33 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
 	return (uint16_t) uc | (uint16_t) color << 8;
 }
 
+#define KEY_BUFF_SIZE 32
+volatile char   characters[32];
+volatile size_t i = 0;
+volatile bool_t drawc = false;
+
+void getc() {
+	char status;
+	do {
+		status = inb(KEYBOARD_STATUS_PORT);
+	} while ((status & 0x01) == 0);
+
+	unsigned char scancode = inb(KEYBOARD_DATA_PORT);
+
+	static int shift_pressed = 0;
+
+	if (scancode == 0x2A) {
+		shift_pressed = 1;
+		return;
+	} else if (scancode == 0xAA) {
+		shift_pressed = 0;
+		return;
+	} else if (keyboard_map[scancode] == KEY_NUML) numlock = !numlock;
+	
+	characters[++i&KEY_BUFF_SIZE] = (scancode & 0x80) ? 0 : (numlock ? (shift_pressed ? keyboard_map_numlock_shifted[scancode] : keyboard_map_numlock[scancode]): (shift_pressed ? keyboard_map_shifted[scancode] : keyboard_map[scancode]));
+	drawc = true;
+}
+
 uint16_t getch() {
 	char status;
 	do {

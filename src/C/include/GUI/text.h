@@ -134,7 +134,7 @@ byte_t font8x8_basic[128][8] = {
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}	// U+007F
 };
 
-void draw_char(byte_t* membuff, wchar_t c, int x, int y, int color) {
+void draw_char(byte_t* membuff, wchar_t c, int x, int y, int Colour) {
 	if (c > 127) {
 		c = L'?';
 	}
@@ -145,27 +145,33 @@ void draw_char(byte_t* membuff, wchar_t c, int x, int y, int color) {
 		uint8_t bits = bitmap[row];
 		for (int col = 0; col < 8; col++) {
 			if (bits & (1 << col)) {
-				putp(membuff, x + col, y + row, color);
+				putp(membuff, x + col, y + row, Colour);
 			}
 		}
 	}
 }
 
-void draw_text(byte_t* membuff, wchar_t* s, int x, int y, int color) {
+void draw_text(byte_t* membuff, wchar_t* s, int x, int y, int Colour) {
 	if (s == NULL) return;
 	for (size_t i = 0; s[i] != 0; ++i)
-		draw_char(membuff, s[i], x + i * FONT_WIDTH, y, color);
+		draw_char(membuff, s[i], x + i * FONT_WIDTH, y, Colour);
 }
 
-void draw_textw(byte_t* membuff, window_t* win, wchar_t* s, const uint32_t x0, uint32_t y0, int color, int xmar, bool_t wrap) {
+void draw_textw(byte_t* membuff, window_t* win, wchar_t* s, const uint32_t x0, uint32_t y0, int Colour, int xmar, bool_t wrap) {
 	uint32_t char_x;
+	bool_t wait = false;
+
 	if (s == NULL) return;
 	for (size_t i = 0; s[i] != 0; ++i) {
-		char_x = x0 + i * FONT_WIDTH;
+		if (wait == false) char_x = x0 + i * FONT_WIDTH;
+		else wait = false;
+		
 		if (char_x >= win->x && char_x < (win->x + win->w - xmar) && y0 >= win->y && y0 < (win->y + win->h)) {
-			draw_char(membuff, s[i], char_x, y0, color);
+			draw_char(membuff, s[i], char_x, y0, Colour);
 		} else if (char_x >= (win->x + win->w)) {
-			if (wrap) { char_x = x0; y0 += FONT_HEIGHT + 2; draw_char(membuff, s[i], char_x, y0, color); }
+			if (wrap) { char_x = x0; y0 += FONT_HEIGHT + 2; wait = true;
+				continue;
+			}
 			else break;
 		}
 	}
