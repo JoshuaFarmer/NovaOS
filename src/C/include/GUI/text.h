@@ -1,5 +1,6 @@
 #pragma once
-#include "typedef.h"
+#include "GUI/GUIdef.h"
+
 #define FONT_WIDTH 8
 #define FONT_HEIGHT 8
 

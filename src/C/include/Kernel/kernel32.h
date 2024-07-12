@@ -43,6 +43,7 @@ void init_pic(void) {
 
 #include "Kernel/string.h"
 #include "Kernel/malloc.h"
+#include "ata.h"
 //#include "Kernel/ata.h"
 //#include "Kernel/diskio.h"
 //#include "ff.h"
@@ -50,5 +51,3 @@ void init_pic(void) {
 
 //#include "emu.h"
 #include "Kernel/video.h"
-
-// Setup VGA buffer. Initialize the VGA frame buffer. (I think - x4exr)

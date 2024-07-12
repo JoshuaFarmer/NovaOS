@@ -5,6 +5,49 @@
 #include "math.h"
 #include "io.h"
 
+#define vga_color vga_colour
+
+enum vga_colour {
+	VGA_COLOR_BLACK = 0,
+	VGA_COLOR_BLUE = 1,
+	VGA_COLOR_GREEN = 2,
+	VGA_COLOR_CYAN = 3,
+	VGA_COLOR_RED = 4,
+	VGA_COLOR_MAGENTA = 5,
+	VGA_COLOR_BROWN = 6,
+	VGA_COLOR_LIGHT_GREY = 7,
+	VGA_COLOR_DARK_GREY = 8,
+	VGA_COLOR_LIGHT_BLUE = 9,
+	VGA_COLOR_LIGHT_GREEN = 10,
+	VGA_COLOR_LIGHT_CYAN = 11,
+	VGA_COLOR_LIGHT_RED = 12,
+	VGA_COLOR_LIGHT_MAGENTA = 13,
+	VGA_COLOR_LIGHT_BROWN = 14,
+	VGA_COLOR_WHITE = 15,
+};
+
+enum {
+	KEY_TAB = '\t',
+	KEY_NULL = 0xfff, KEY_ESC, KEY_CTRL, KEY_ALT,
+	KEY_NUML, KEY_SCRL, KEY_HOM,
+	KEY_UP, KEY_PGU, KEY_LE, KEY_RI, KEY_END, KEY_DN, KEY_PGD, KEY_INS, KEY_DEL,
+	
+	KEY_F1,
+	KEY_F2,
+	KEY_F3,
+	KEY_F4,
+	KEY_F5,
+	KEY_F6,
+	KEY_F7,
+	KEY_F8,
+	KEY_F9,
+	KEY_F10,
+	KEY_F11,
+	KEY_F12,
+
+	KEY_INTERACT,
+} keys;
+
 void putc(const uint16_t c);
 void scroll_terminal();
 

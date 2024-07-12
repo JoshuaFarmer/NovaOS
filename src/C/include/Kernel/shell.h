@@ -1,6 +1,6 @@
 #pragma once
 #include "typedef.h"
-#include "Kernel/memory.h"
+#include "Kernel/string.h"
 #include "Kernel/video.h"
 #include "GUI/NovaGUI.h"
 

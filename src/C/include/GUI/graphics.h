@@ -1,5 +1,5 @@
 #pragma once
-#include "typedef.h"
+#include "GUI/GUIdef.h"
 #include "Kernel/malloc.h"
 
 void fillRect(rect_t* rect, uint8_t Colour) {

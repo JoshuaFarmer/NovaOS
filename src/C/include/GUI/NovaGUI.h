@@ -1,5 +1,5 @@
 #pragma once
-#include "typedef.h"
+#include "GUI/GUIdef.h"
 #include "interrupts.h"
 #include "GUI/text.h"
 #include "GUI/element.h"

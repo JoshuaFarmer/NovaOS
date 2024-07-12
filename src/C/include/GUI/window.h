@@ -1,5 +1,5 @@
 #pragma once
-#include "typedef.h"
+#include "GUI/GUIdef.h"
 
 static bool_t redraw=true;
 static uint32_t mousex=50,mousey=50;

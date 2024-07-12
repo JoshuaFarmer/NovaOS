@@ -1,5 +1,5 @@
 #pragma once
-#include "typedef.h"
+#include "GUI/GUIdef.h"
 #include "Kernel/malloc.h"
 #include "GUI/graphics.h"
 
