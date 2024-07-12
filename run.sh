@@ -12,4 +12,4 @@ grub-mkrescue -o bin/Nova.iso isodir
 qemu-img convert -O qcow2 bin/Nova.iso bin/Nova.qcow2
 
 # Optionally run the OS in QEMU
-qemu-system-x86_64 -m 256M -soundhw pcspk -debugcon stdio -drive file=bin/Nova.qcow2,format=qcow2
+qemu-system-i386 -m 256M -soundhw pcspk -debugcon stdio -drive file=bin/Nova.qcow2,format=qcow2
