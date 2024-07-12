@@ -132,7 +132,7 @@ typedef enum uint32_t {
 	elemtext,
 	elembitmap,
 	elembutton,
-	elemtextbox,
+	elemtextinp,
 } element_type_t;
 
 typedef struct {

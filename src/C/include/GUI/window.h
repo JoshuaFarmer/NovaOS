@@ -150,14 +150,27 @@ element_t* handle_elems(windows_t* GUIWindows, uint32_t x, uint32_t y) {
 		element_t* elem = win->elements[i];
 		if (!elem) continue;
 
-		if (elem->type != elembutton) continue;
-		
-		if (x >= win->x + elem->x && x < win->x + elem->x + ((button_t*)elem->data.raw)->w &&
-			y >= win->y + elem->y && y < win->y + elem->y + ((button_t*)elem->data.raw)->h + CONTROL_HEIGHT) {
-			
-			((button_t*)elem->data.raw)->onClick((void*)win, (void*)elem);
-			redraw = true;
-			return elem;
+		switch(elem->type) {
+			case elembutton:
+				if (x >= win->x + elem->x && x < win->x + elem->x + ((button_t*)elem->data.raw)->w &&
+					y >= win->y + elem->y && y < win->y + elem->y + ((button_t*)elem->data.raw)->h + CONTROL_HEIGHT) {
+					
+					((button_t*)elem->data.raw)->onClick((void*)win, (void*)elem);
+					redraw = true;
+					return elem;
+				}
+				break;
+			case elemtextinp:
+				if (x >= win->x + elem->x && x < win->x + elem->x + ((button_t*)elem->data.raw)->w &&
+					y >= win->y + elem->y && y < win->y + elem->y + ((button_t*)elem->data.raw)->h + CONTROL_HEIGHT) {
+					
+					
+					redraw = true;
+					return elem;
+				}
+				break;
+			default:
+				continue;
 		}
 	}
 
