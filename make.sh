@@ -7,7 +7,7 @@ find . \( -name '*.c' -or -name '*.h' -or -name '*.s' -or -name '*.asm' \) -prin
 clang -m32 -c "src/asm/boot.s" -o "bin/boot.o" -march=i386
 nasm  -f elf32 "src/asm/interrupts.asm" -o "bin/interrupts.o"
 
-# kernel
+# Kernel
 clang -m32 -c -ffreestanding "src/C/kernel32.c" -o "bin/krnl32.o" -Wall -Wextra -march=i386 -I src/C/include
 clang -m32 -c -ffreestanding "src/C/io.c" -o "bin/io.o" -Wall -Wextra -march=i386 -I src/C/include
 clang -m32 -c -ffreestanding "src/C/ata.c" -o "bin/ata.o" -Wall -Wextra -march=i386 -I src/C/include
