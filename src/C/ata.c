@@ -66,7 +66,7 @@ void ata_read_sector(uint32_t lba, uint8_t *buffer) {
 	}
 }
 
-void ata_write_sector(uint32_t lba, uint8_t *buffer) {
+void ata_write_sector(uint32_t lba, const byte_t* buffer) {
 	outb(ATA_PRIMARY_CONTROL_BASE, 0x02);
 	outb(ATA_PRIMARY_IO + 6, 0xE0 | ((lba >> 24) & 0x0F));
 	outb(ATA_PRIMARY_IO + 1, 0x00);
@@ -104,20 +104,7 @@ uint8_t ata_disk_status() {
 uint8_t init_ata() {
 	// Disable ATA IRQs
 	disable_ata_irq();
-
-	// Select the slave drive
-	ata_select_drive(1);
-
-	// Identify the slave drive
-	identify_ata(0xB0);
-
-	// Select the master drive
 	ata_select_drive(0);
-
-	// Identify the master drive
-	identify_ata(0xA0);
-
-	printf("ATA initialization complete.\n");
 
 	return ata_disk_status();
 }
@@ -126,6 +113,14 @@ void ata_read(byte_t* buff, uint32_t lba, uint32_t count) {
 	byte_t* buffer = buff;
 	for(size_t i = 0; i < count; ++i) {
 		ata_read_sector(lba+i, buffer);
+		buffer += 512;
+	}
+}
+
+void ata_write(const byte_t* buff, uint32_t lba, uint32_t count) {
+	const byte_t* buffer = buff;
+	for(size_t i = 0; i < count; ++i) {
+		ata_write_sector(lba+i, buffer);
 		buffer += 512;
 	}
 }

@@ -214,69 +214,6 @@ void draw_bg(byte_t* membuff, byte_t* data) {
 	}
 }
 
-void window_mngr0() {
-	if (windowmngr) {
-		if (redraw) {
-			memset(membuff, DESKTOP_C, 320*200);
-			for (size_t i = 0; i < MAX_WINDOW_COUNT; ++i) {
-				if (GUIWindows->windows[i])
-					drawWindow(GUIWindows->windows[i]);
-				if (active_window) drawWindow(active_window);
-			}
-
-			for (int y=0; y < CURS_H; ++y) {
-				for (int x=0; x < CURS_W; ++x) {
-					if (curs[y][x] == 1)
-						putp(membuff, mousex+x, mousey+y, 240);
-					else if (curs[y][x] == 2)
-						putp(membuff, mousex+x, mousey+y, 255);
-				}
-			}
-
-			update_screen(membuff);
-			redraw = false;
-		}
-
-		handle_updates(GUIWindows);
-	}
-}
-
-void window_mngr(windows_t* wins) {
-	GUIWindows = wins;
-	windowmngr = true;
-	while (true) {
-		switch (getch()) {
-			case KEY_LE:
-				mousex-=mouses;
-				if (active_window != NULL && moving) active_window->x -= mouses;
-				if (active_window != NULL && resize) {active_window->w -= mouses; if (active_window->w < MIN_WIN_W) {active_window->w = MIN_WIN_W; moving = false; resize = false; active_window = NULL; } }
-				redraw = true; break;
-			case KEY_RI:
-				mousex+=mouses;
-				if (active_window != NULL && moving) active_window->x += mouses;
-				if (active_window != NULL && resize) {active_window->w += mouses; if (active_window->w < MIN_WIN_W) {active_window->w = MIN_WIN_W; moving = false; resize = false; active_window = NULL; } }
-					redraw = true; break;
-			case KEY_UP:
-				mousey-=mouses;
-				if (active_window != NULL && moving) active_window->y -= mouses;
-				if (active_window != NULL && resize) {active_window->h -= mouses; if (active_window->h < MIN_WIN_H) {active_window->h = MIN_WIN_H; moving = false; resize = false; active_window = NULL; } }
-				redraw = true; break;
-			case KEY_DN:
-				mousey+=mouses;
-				if (active_window != NULL && moving) active_window->y += mouses;
-				if (active_window != NULL && resize) {active_window->h += mouses; if (active_window->h < MIN_WIN_H) {active_window->h = MIN_WIN_H; moving = false; resize = false; active_window = NULL; } }
-				redraw = true; break;
-			case KEY_INS: {
-				handle_drag(GUIWindows, mousex, mousey);
-				handle_resize(GUIWindows, mousex, mousey);
-				handle_close(GUIWindows, mousex, mousey);
-				handle_elems(GUIWindows, mousex, mousey);
-				break;
-			}
-		}
-	}
-}
-
 void init_graphics() {
 	current_buffer = membuff;
 

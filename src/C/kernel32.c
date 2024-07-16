@@ -9,6 +9,79 @@ void init(void) {
 	clsscr();
 }
 
+void testFatFS() {
+	FATFS fs;	 // File system object
+	FIL fil;	  // File object
+	FRESULT fr;   // FatFS return code
+	// BYTE work[FF_MAX_SS]; // Work area (larger is better for some functions)
+
+	// Initialize the disk
+	fr = disk_initialize(0);
+	if (fr != RES_OK) {
+		printf("%tFatFS Disk Error: %d\n", VGA_COLOR_LIGHT_RED,fr);
+		return;
+	}
+
+	// Mount the filesystem
+	fr = f_mount(&fs, "", 1);
+	if (fr != FR_OK) {
+		printf("%tFatFS Mount Error: %d\n", VGA_COLOR_LIGHT_RED,fr);
+		return;
+	}
+
+	// Open a file for writing (create if it doesn't exist)
+	fr = f_open(&fil, "test.txt", FA_WRITE | FA_CREATE_ALWAYS);
+	if (fr != FR_OK) {
+		printf("%tFatFS Open(W) Error: %d\n", VGA_COLOR_LIGHT_RED,fr);
+		f_mount(NULL, "", 0);  // Unmount the filesystem
+		return;
+	}
+
+	// Write data to the file
+	const char *text = "FatFS test successful!";
+	UINT bytesWritten;
+	fr = f_write(&fil, text, strlen(text), &bytesWritten);
+	if (fr != FR_OK || bytesWritten < strlen(text)) {
+		printf("%tFatFS Write Error: %d\n", VGA_COLOR_LIGHT_RED,fr);
+		f_close(&fil);
+		f_mount(NULL, "", 0);  // Unmount the filesystem
+		return;
+	}
+
+	// Close the file
+	f_close(&fil);
+
+	// Open the file for reading
+	fr = f_open(&fil, "test.txt", FA_READ);
+	if (fr != FR_OK) {
+		printf("%tFatFS Open(R) Error: %d\n", VGA_COLOR_LIGHT_RED,fr);
+		f_mount(NULL, "", 0);  // Unmount the filesystem
+		return;
+	}
+
+	// Read data from the file
+	char buffer[64];
+	UINT bytesRead;
+	fr = f_read(&fil, buffer, sizeof(buffer) - 1, &bytesRead);
+	if (fr != FR_OK) {
+		printf("%tFatFS Read Error: %d\n", VGA_COLOR_LIGHT_RED,fr);
+
+		f_close(&fil);
+		f_mount(NULL, "", 0);  // Unmount the filesystem
+		return;
+	}
+
+	// Null-terminate the buffer and print the read data
+	buffer[bytesRead] = '\0';
+	printf("Read from file: %s\n", buffer);
+
+	// Close the file
+	f_close(&fil);
+
+	// Unmount the filesystem
+	f_mount(NULL, "", 0);
+}
+
 void kernel_main() {
 	init();
 
@@ -28,6 +101,8 @@ void kernel_main() {
 	disable_ata_irq();
 	identify_ata(0xA0);
 	ata_disk_status();
+
+	testFatFS();
 
 	memcpy(system_user, "default", 32);
 

@@ -1,5 +1,4 @@
 #pragma once
-#define FF_FS_READONLY 0
 
 #include <stdarg.h>
 #include "typedef.h"
@@ -43,11 +42,10 @@ void init_pic(void) {
 
 #include "Kernel/string.h"
 #include "Kernel/malloc.h"
-#include "ata.h"
-//#include "Kernel/ata.h"
-//#include "Kernel/diskio.h"
-//#include "ff.h"
-//#include "ffconf.h"
-
-//#include "emu.h"
 #include "Kernel/video.h"
+
+#include "ata.h"
+
+#include "FatFS/diskio.h"
+#include "FatFS/ff.h"
+#include "FatFS/ffconf.h"
