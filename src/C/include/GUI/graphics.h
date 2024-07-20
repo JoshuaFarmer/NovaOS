@@ -20,7 +20,7 @@ void drawLine(int x0, int y0, int x1, int y1, uint8_t Colour) {
 	int err = dx + dy;
 	int e2;
 
-	while (1) {
+	while (true) {
 		if (x0 >= 0 && x0 < GVGA_WIDTH && y0 >= 0 && y0 < GVGA_HEIGHT) {
 			vga[y0 * GVGA_WIDTH + x0] = Colour;
 		}

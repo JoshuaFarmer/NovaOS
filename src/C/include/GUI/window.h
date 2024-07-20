@@ -225,12 +225,12 @@ void init_graphics() {
 	size_t x = 0;
 
 	// Create a Colour palette for the first 240 Colours
-	for (int r = 0; r < 8; ++r) {
+	for (int r = 0; r < 4; ++r) {
 		for (int g = 0; g < 8; ++g) {
-			for (int b = 0; b < 4; ++b) {
+			for (int b = 0; b < 8; ++b) {
 				if (x < 240 * 3) {
-					PAL256[x++] = (r << 2); // Red component
-					PAL256[x++] = (g << 2); // Green component
+					PAL256[x++] = (r << 5); // Red component
+					PAL256[x++] = (g << 3); // Green component
 					PAL256[x++] = (b << 3); // Blue component
 				}
 			}
@@ -246,4 +246,13 @@ void init_graphics() {
 	}
 
 	VGASetPal(PAL256, 0, 256);
+
+	for (int y = 0; y < 200; ++y) {
+		for (int u = 0; u < 256; ++u) {
+			((byte_t*)vgabuff)[GVGA_WIDTH*y +u]=u;
+		}
+	}
+
+	while(getch() != 'E');
+	//while(true);
 }

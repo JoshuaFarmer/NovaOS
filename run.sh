@@ -36,6 +36,7 @@ grub-install --target=i386-pc --boot-directory=$MOUNT_DIR/boot --no-floppy --mod
 cat > $GRUB_CFG << EOF
 set timeout=5
 set default=0
+set gfxmode=640x480
 
 menuentry "Supernova OS" {
 	multiboot /boot/Nova.bin
