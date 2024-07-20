@@ -3,10 +3,14 @@
 set -e
 
 # Define the disk image size and name
-IMAGE_SIZE_MB=600
+IMAGE_SIZE_MB=1024
 IMAGE_NAME="disk_image.img"
 MOUNT_DIR="mnt"
 GRUB_CFG="grub.cfg"
+
+if [ -e $IMAGE_NAME ]; then
+	rm $IMAGE_NAME
+fi
 
 # Create a 512MB disk image
 dd if=/dev/zero of=$IMAGE_NAME bs=1M count=$IMAGE_SIZE_MB

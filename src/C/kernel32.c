@@ -13,7 +13,7 @@ void testFatFS() {
 	FATFS fs;	 // File system object
 	FIL fil;	  // File object
 	FRESULT fr;   // FatFS return code
-	// BYTE work[FF_MAX_SS]; // Work area (larger is better for some functions)
+	BYTE work[FF_MAX_SS]; // Work area (larger is better for some functions)
 
 	// Initialize the disk
 	fr = disk_initialize(0);

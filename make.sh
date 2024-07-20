@@ -28,6 +28,7 @@ ld -m elf_i386 -T linker.ld -o bin/Nova.bin -O2 -nostdlib "bin/boot.o" "bin/inte
 # Check if the binary is multiboot compliant
 if grub-file --is-x86-multiboot bin/Nova.bin; then
 	echo "Multiboot confirmed"
+	sh run.sh
 	exit 0
 else
 	echo "The file is not multiboot"

@@ -102,7 +102,6 @@ uint8_t ata_disk_status() {
 }
 
 uint8_t init_ata() {
-	// Disable ATA IRQs
 	disable_ata_irq();
 	ata_select_drive(0);
 
