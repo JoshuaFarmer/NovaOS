@@ -2,3 +2,4 @@ bin/
 isodir/
 .vscode/
 mnt/
+disk_image.img

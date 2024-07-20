@@ -23,7 +23,7 @@ void testFatFS() {
 	}
 
 	// Mount the filesystem
-	fr = f_mount(&fs, "", 1);
+	fr = f_mount(&fs, "0:", 1);
 	if (fr != FR_OK) {
 		printf("%tFatFS Mount Error: %d\n", VGA_COLOR_LIGHT_RED,fr);
 		return;

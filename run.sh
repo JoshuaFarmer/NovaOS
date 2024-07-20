@@ -1,43 +1,59 @@
 #!/bin/bash
 
-# Check if ISODIR is provided
-if [ -z "$1" ]; then
-  echo "Usage: $0 <ISODIR>"
-  exit 1
-fi
+set -e
 
-ISODIR=$1
-IMGFILE="output.img"
-ISOFILE="rescue.iso"
-SIZE=100M  # Adjust size as needed
+# Define the disk image size and name
+IMAGE_SIZE_MB=600
+IMAGE_NAME="disk_image.img"
+MOUNT_DIR="mnt"
+GRUB_CFG="grub.cfg"
 
-# Create an empty disk image
-dd if=/dev/zero of=$IMGFILE bs=1M count=$(echo $SIZE | sed 's/M//')
+# Create a 512MB disk image
+dd if=/dev/zero of=$IMAGE_NAME bs=1M count=$IMAGE_SIZE_MB
 
-# Create a loop device
-LOOPDEV=$(losetup -f --show $IMGFILE)
+# Create a partition table
+parted $IMAGE_NAME --script mklabel msdos
+parted $IMAGE_NAME --script mkpart primary fat32 1MiB 100%
 
-# Create a FAT32 filesystem
-mkfs.vfat -F 32 $LOOPDEV
+# Associate the image with a loop device
+LOOP_DEVICE=$(losetup --show -fP $IMAGE_NAME)
 
-# Mount the loop device
-MOUNTDIR=$(mktemp -d)
-mount ${LOOPDEV}p1 $MOUNTDIR
+# Create a FAT32 filesystem on the partition
+mkfs.vfat -F 32 ${LOOP_DEVICE}p1
 
-# Copy the contents of ISODIR to the image
-cp -r $ISODIR/* $MOUNTDIR
+# Mount the partition
+mkdir -p $MOUNT_DIR
+mount ${LOOP_DEVICE}p1 $MOUNT_DIR
+
+# Install GRUB
+grub-install --target=i386-pc --boot-directory=$MOUNT_DIR/boot --no-floppy --modules="part_msdos" ${LOOP_DEVICE}
+
+# Create a grub.cfg file
+cat > $GRUB_CFG << EOF
+set timeout=5
+set default=0
+
+menuentry "Supernova OS" {
+	multiboot /boot/Nova.bin
+	boot
+}
+EOF
+
+# Copy the grub.cfg to the boot directory
+mkdir -p $MOUNT_DIR/boot/grub
+cp $GRUB_CFG $MOUNT_DIR/boot/grub/grub.cfg
+
+# Copy the Nova binary to the boot directory
+cp "bin/Nova.bin" "$MOUNT_DIR/boot/Nova.bin"
 
 # Unmount and detach the loop device
-umount $MOUNTDIR
-losetup -d $LOOPDEV
+umount $MOUNT_DIR
+losetup -d $LOOP_DEVICE
 
 # Clean up
-rmdir $MOUNTDIR
+rmdir $MOUNT_DIR
 
-# Create an ISO image from the ISODIR
-grub-mkrescue -o $ISOFILE $1
+echo "GRUB installed to $IMAGE_NAME successfully."
 
-echo "Created $IMGFILE and $ISOFILE from $ISODIR"
-
-# Optionally, you can test the ISO with QEMU
-qemu-system-i386 -m 256M -cdrom $ISOFILE -drive file=$IMGFILE,format=raw -boot d
+# Launch the disk image with QEMU
+qemu-system-i386 -m 256M -drive file=$IMAGE_NAME,format=raw,if=ide,index=0,media=disk
