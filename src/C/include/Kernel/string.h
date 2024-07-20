@@ -16,5 +16,5 @@ char *strchr(const char *str, int c);
 size_t wstrlen(const wchar_t* str);
 void wstrcpy(wchar_t* dst, const wchar_t* src);
 void memset(void* des, int value, size_t size);
-void memcpy(void* des, void* src, size_t size);
+void memcpy(void* des, const void* src, size_t size);
 int memcmp(const void *str1, const void *str2, size_t n);

@@ -102,8 +102,6 @@ void kernel_main() {
 	identify_ata(0xA0);
 	ata_disk_status();
 
-	testFatFS();
-
 	memcpy(system_user, "default", 32);
 
 	// printf("%t#############\n%t#############\n%t#############\n%t#############\n%t#############\n", VGA_COLOR_LIGHT_CYAN,VGA_COLOR_LIGHT_RED,VGA_COLOR_WHITE,VGA_COLOR_LIGHT_RED,VGA_COLOR_LIGHT_CYAN);

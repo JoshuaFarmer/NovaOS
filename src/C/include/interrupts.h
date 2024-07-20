@@ -88,6 +88,7 @@ extern void system_interrupt80_handler();
 extern void system_interrupt0_handler();
 extern void keyboard_interrupt_handler();
 extern void default_exception_handler();
+extern void mouse_interrupt_handler();
 
 void system_interrupt80() {
 	draw_text(membuff, L"INTERRUPT 0x80 CALLED", 0, 0, 255);
@@ -95,8 +96,10 @@ void system_interrupt80() {
 }
 
 void system_interrupt0() {
+	cli();
 	outb(PIC1_COMMAND, 0x20);
 	window_mngr0();
+	sti();
 }
 
 void default_exception() {

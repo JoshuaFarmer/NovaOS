@@ -53,6 +53,7 @@ void window_mngr0() {
 void window_mngr(windows_t* wins) {
 	GUIWindows = wins;
 	windowmngr = true;
+	
 	while (true) {
 		switch (getch()) {
 			case KEY_LE:
@@ -83,6 +84,9 @@ void window_mngr(windows_t* wins) {
 				break;
 			}
 		}
+
+		if (mousex > 320) mousex = 320;
+		if (mousey > 200) mousey = 200;
 	}
 }
 

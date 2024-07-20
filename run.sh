@@ -61,4 +61,4 @@ rmdir $MOUNT_DIR
 echo "GRUB installed to $IMAGE_NAME successfully."
 
 # Launch the disk image with QEMU
-qemu-system-i386 -m 256M -drive file=$IMAGE_NAME,format=raw,if=ide,index=0,media=disk
+qemu-system-i386 -m 256M -drive file=$IMAGE_NAME,format=raw,if=ide,index=0,media=disk -debugcon stdio

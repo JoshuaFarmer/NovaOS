@@ -21,6 +21,8 @@ void system(const uint16_t* sys);
 #include "Kernel/shell.h"
 
 void init_pic(void) {
+	outb(PIC2_DATA, 0xFF);
+
 	// ICW1: Initialization - starts the PICs
 	outb(PIC1_COMMAND, 0x11); // Start initialization sequence for PIC1
 	outb(PIC2_COMMAND, 0x11); // Start initialization sequence for PIC2
