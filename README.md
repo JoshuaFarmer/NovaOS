@@ -1,6 +1,6 @@
 simple 32 bit operating system. <br>
 Todo: <br>
-finish EXT-2<br>
+finish Fat32<br>
 simple elf loading<br>
 simple window mngr<br>
 
