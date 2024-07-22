@@ -113,9 +113,9 @@ void exception_ok(window_t* whnd) {
 }
 
 int exception_wm(window_t* whnd) {
-	element_t* text1 = create_text_element(whnd, L"An exception error", 0, 0);
-	element_t* text2 = create_text_element(whnd, L"has occured.", 0, 12);
-	element_t* butt = create_button_element(whnd, L"ok", &exception_ok, (whnd->w) - (24 >> 1), (whnd->h >> 1) - 2, 24, 12);
+	create_text_element(whnd, L"An exception error", 0, 0);
+	create_text_element(whnd, L"has occured.", 0, 12);
+	create_button_element(whnd, L"ok", &exception_ok, (whnd->w) - (24 >> 1), (whnd->h >> 1) - 2, 24, 12);
 	return 0;
 }
 
