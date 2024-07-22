@@ -111,7 +111,7 @@ static inline uint16_t vga_entry(unsigned char uc, uint8_t color) {
 }
 
 #define KEY_BUFF_SIZE 32
-volatile char   characters[32];
+volatile char   characters[KEY_BUFF_SIZE];
 volatile size_t i = 0;
 volatile bool_t drawc = false;
 
@@ -154,7 +154,7 @@ uint16_t getch() {
 		shift_pressed = 0;
 		return 0;
 	} else if (keyboard_map[scancode] == KEY_NUML) numlock = !numlock;
-	
+
 	return (scancode & 0x80) ? 0 : (numlock ? (shift_pressed ? keyboard_map_numlock_shifted[scancode] : keyboard_map_numlock[scancode]): (shift_pressed ? keyboard_map_shifted[scancode] : keyboard_map[scancode]));
 }
 

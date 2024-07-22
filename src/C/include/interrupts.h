@@ -1,6 +1,12 @@
 #pragma once
 #include "typedef.h"
 #include "pit.h"
+#include "GUI/text.h"
+#include "GUI/element.h"
+#include "GUI/graphics.h"
+#include "GUI/video.h"
+#include "GUI/window.h"
+#include "GUI/taskbar.h"
 
 void window_mngr0();
 
@@ -102,8 +108,25 @@ void system_interrupt0() {
 	sti();
 }
 
+void exception_ok(window_t* whnd) {
+	remove_window(whnd, &windows);
+}
+
+int exception_wm(window_t* whnd) {
+	element_t* text1 = create_text_element(whnd, L"An exception error", 0, 0);
+	element_t* text2 = create_text_element(whnd, L"has occured.", 0, 12);
+	element_t* butt = create_button_element(whnd, L"ok", &exception_ok, (whnd->w) - (24 >> 1), (whnd->h >> 1) - 2, 24, 12);
+	return 0;
+}
+
+int example_wu(window_t* whnd) { return 0; }
+
 void default_exception() {
 	printf("EXCEPTION ERROR\n");
+	if (windowmngr == true) {
+		window_t *errwhnd = init_window(160, 60, L"Error", (int (*)(void*))&exception_wm, (void (*)(void*))&example_wu);
+		if(add_window(errwhnd)) draw_text(membuff, L"BRUH", 0, 0, 0);
+	}
 }
 
 void init_idt() {

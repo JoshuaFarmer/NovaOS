@@ -24,7 +24,6 @@ void example_update(void* ptr) {
 
 void window_mngr0() {
 	if (windowmngr) {
-		if (redraw) {
 			memset(membuff, DESKTOP_C, 320*200);
 			for (size_t i = 0; i < MAX_WINDOW_COUNT; ++i) {
 				if (GUIWindows->windows[i])
@@ -44,7 +43,6 @@ void window_mngr0() {
 
 			update_screen(membuff);
 			redraw = false;
-		}
 
 		handle_updates(GUIWindows);
 	}
@@ -53,7 +51,8 @@ void window_mngr0() {
 void window_mngr(windows_t* wins) {
 	GUIWindows = wins;
 	windowmngr = true;
-	
+	sti();
+	default_exception();
 	while (true) {
 		switch (getch()) {
 			case KEY_LE:
@@ -85,8 +84,8 @@ void window_mngr(windows_t* wins) {
 			}
 		}
 
-		if (mousex > 320) mousex = 320;
-		if (mousey > 200) mousey = 200;
+		if (mousex > 320) mousex = 0;
+		if (mousey > 200) mousey = 0;
 	}
 }
 
@@ -96,8 +95,8 @@ void start_gui(void) {
 	init_heap();
 	init_graphics();
 
-	window_t *window1 = init_window(96, 144, L"test window 1", example_main, example_update);
+	//window_t *window1 = init_window(96, 144, L"test window 1", example_main, example_update);
 
-	if(add_window(window1)) draw_text(membuff, L"BRUH", 0, 0, 0);
+	//if(add_window(window1)) draw_text(membuff, L"BRUH", 0, 0, 0);
 	window_mngr(&windows);
 }

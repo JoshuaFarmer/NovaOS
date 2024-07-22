@@ -24,6 +24,31 @@ int add_window(window_t* window) {
 	return 0;
 }
 
+void remove_window(window_t* win, windows_t* windows) {
+	for (size_t i = 0; i < MAX_ELEMENT_COUNT; ++i) { // remove elems
+		switch(win->elements[i]->type) {
+			case elemtext:
+				remove_text_element(win, win->elements[i]);
+				break;
+			case elembitmap:
+				remove_bitmap_element(win, win->elements[i]);
+				break;
+			case elembutton:
+				remove_button_element(win, win->elements[i]);
+				break;
+			default:
+				break;
+		}
+	}
+
+	size_t x;
+	for (x = 0; x < MAX_WINDOW_COUNT; ++x) {
+		if (windows->windows[x] == win) {windows->windows[x] = NULL; break;}
+	}
+
+	free(win);
+}
+
 void drawWindow(window_t* window) {
 	drawRectWOutline((rect_t*)window, 250, 245); // main
 

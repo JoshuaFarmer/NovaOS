@@ -159,21 +159,35 @@ void draw_text(byte_t* membuff, wchar_t* s, int x, int y, int Colour) {
 }
 
 void draw_textw(byte_t* membuff, window_t* win, wchar_t* s, const uint32_t x0, uint32_t y0, int Colour, int xmar, bool_t wrap) {
-	uint32_t char_x;
+	uint32_t char_x = x0;
 	bool_t wait = false;
 
 	if (s == NULL) return;
 	for (size_t i = 0; s[i] != 0; ++i) {
-		if (wait == false) char_x = x0 + i * FONT_WIDTH;
-		else wait = false;
-		
+		if (s[i] == '\n') {
+			y0 += FONT_HEIGHT + 2;
+			char_x = x0;
+			wait = true;
+			continue;
+		}
+		if (wait == false) {
+			char_x = x0 + (i * FONT_WIDTH);
+		} else {
+			wait = false;
+		}
+
 		if (char_x >= win->x && char_x < (win->x + win->w - xmar) && y0 >= win->y && y0 < (win->y + win->h)) {
 			draw_char(membuff, s[i], char_x, y0, Colour);
-		} else if (char_x >= (win->x + win->w)) {
-			if (wrap) { char_x = x0; y0 += FONT_HEIGHT + 2; wait = true;
+		} else if (char_x >= (win->x + win->w - xmar)) {
+			if (wrap) { 
+				char_x = x0; 
+				y0 += FONT_HEIGHT + 2; 
+				wait = true;
+				i--; // Re-evaluate this character in the next line
 				continue;
-			}
-			else break;
+			} else break;
 		}
 	}
 }
+
+

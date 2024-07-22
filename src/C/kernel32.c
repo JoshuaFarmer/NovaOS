@@ -8,7 +8,7 @@ void init(void) {
 	txtbuff = (uint16_t*) 0xB8000;
 	clsscr();
 }
-
+/*
 void testFatFS() {
 	FATFS fs;	 // File system object
 	FIL fil;	  // File object
@@ -80,7 +80,7 @@ void testFatFS() {
 
 	// Unmount the filesystem
 	f_mount(NULL, "", 0);
-}
+}*/
 
 void kernel_main() {
 	init();
