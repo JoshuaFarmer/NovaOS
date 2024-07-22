@@ -52,7 +52,6 @@ void window_mngr(windows_t* wins) {
 	GUIWindows = wins;
 	windowmngr = true;
 	sti();
-	default_exception();
 	while (true) {
 		switch (getch()) {
 			case KEY_LE:
