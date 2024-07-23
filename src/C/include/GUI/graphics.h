@@ -1,6 +1,50 @@
 #pragma once
 #include "GUI/GUIdef.h"
+#include "GUI/video.h"
 #include "Kernel/malloc.h"
+
+void init_graphics() {
+	current_buffer = membuff;
+
+	/* Initialize terminal interface */
+	VGAMode(3, GVGA_WIDTH, GVGA_HEIGHT,1); // Set VGA mode to 320x200 with 256 Colours
+
+	// Define the palette array for 256 Colours
+	char PAL256[256 * 3];
+	size_t x = 0;
+
+	// Create a Colour palette for the first 240 Colours
+	for (int r = 0; r < 4; ++r) {
+		for (int g = 0; g < 8; ++g) {
+			for (int b = 0; b < 8; ++b) {
+				if (x < 240 * 3) {
+					PAL256[x++] = (r << 5); // Red component
+					PAL256[x++] = (g << 3); // Green component
+					PAL256[x++] = (b << 3); // Blue component
+				}
+			}
+		}
+	}
+
+	// Create a grayscale palette for the last 16 Colours
+	for (int i = 0; i < 16; ++i) {
+		unsigned char gray = (i * 4);
+		PAL256[x++] = gray; // Red component
+		PAL256[x++] = gray; // Green component
+		PAL256[x++] = gray; // Blue component
+	}
+
+	VGASetPal(PAL256, 0, 256);
+
+	for (int y = 0; y < 200; ++y) {
+		for (int u = 0; u < 256; ++u) {
+			((byte_t*)vgabuff)[GVGA_WIDTH*y +u]=u;
+		}
+	}
+
+	while(getch() != 'E');
+	//while(true);
+}
 
 void fillRect(rect_t* rect, uint8_t Colour) {
 	uint8_t* vga = current_buffer;

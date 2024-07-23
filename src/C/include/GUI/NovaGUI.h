@@ -94,8 +94,8 @@ void start_gui(void) {
 	init_heap();
 	init_graphics();
 
-	//window_t *window1 = init_window(96, 144, L"test window 1", example_main, example_update);
+	window_t *window1 = init_window(96, 144, L"test window 1", example_main, example_update);
 
-	//if(add_window(window1)) draw_text(membuff, L"BRUH", 0, 0, 0);
+	if(add_window(window1)) draw_text(membuff, L"BRUH", 0, 0, 0);
 	window_mngr(&windows);
 }

@@ -1,9 +1,14 @@
 #pragma once
 #include "GUI/GUIdef.h"
 #include "GUI/graphics.h"
-#define  TSKBRW (320 * 0.75)
-#define  TSKBRX (320 * 0.25/2)
-#define  TSKBRH 24
+#define  TSKBRW 320
+#define  TSKBRX 0
+#define  TSKBRH 16
+
+#define STRTW 40
+#define STRTX 0
+#define STRTH 12
+#define STRTT L"Start"
 
 #define ICOW 24
 #define ICOH 24
@@ -51,9 +56,17 @@ void drawTaskbar(void) {
 	rect->w = TSKBRW;
 	rect->h = TSKBRH;
 
-	drawRectWOutline(rect, 0xfa, 0xf5);
+	fillRect(rect, 0xfa);
 
 	for (size_t x = 0; x < MAX_WINDOW_COUNT; ++x)
-		if (windows.windows[x] != NULL)drawDefaultIcon(TSKBRX + 4 + (ICOW*x), 200 - TSKBRH - 8);
+		if (windows.windows[x] != NULL)drawDefaultIcon(STRTW + STRTX + TSKBRX + 4 + (ICOW*x), 200 - TSKBRH - 12);
+
+	rect->x = STRTX;
+	rect->w = STRTW;
+	rect->y = (200 - TSKBRH) + 2;
+	rect->h = STRTH;
+	drawRectWOutline(rect, 0xfa, 0xf5);
+	
+	draw_text(current_buffer, L"Nova", STRTX + 4, (200 - TSKBRH) + 4, 0xff);
 	free(rect);
 }
