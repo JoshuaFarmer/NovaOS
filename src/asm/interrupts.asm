@@ -3,7 +3,7 @@ global system_interrupt0_handler
 global keyboard_interrupt_handler
 global default_exception_handler
 
-extern system_interrupt80
+extern _syscall
 extern system_interrupt0
 extern default_exception
 extern getc
@@ -29,36 +29,10 @@ system_interrupt0_handler:
 	sti
 	iret
 
+; yes
 system_interrupt80_handler:
-	cli
-	pusha
-
-	cmp eax, 0x0 ; default
-	je  .none
-	cmp eax, 0x1 ; create window
-	je  .createwindow
-	cmp eax, 0x2 ; create text element
-	je .createtext
-.exit:
-	popa
-.exit2:
-	sti
+	call _syscall
 	iret
-.none:
-	call system_interrupt80
-	jmp .exit
-.createwindow:
-	mov edx, ebx
-	call add_window
-	jmp .exit
-.createtext:
-	push edx
-	push esi
-	push cx
-	push bx
-	call create_text_element
-	add esp, 16
-	jmp .exit
 
 default_exception_handler:
 	cli

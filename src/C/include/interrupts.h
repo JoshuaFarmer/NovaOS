@@ -96,9 +96,26 @@ extern void keyboard_interrupt_handler();
 extern void default_exception_handler();
 extern void mouse_interrupt_handler();
 
-void system_interrupt80() {
-	draw_text(membuff, L"INTERRUPT 0x80 CALLED", 0, 0, 255);
-	debug_print("INT 0x80 CALLED\n");
+uint32_t _syscall(uint32_t X, uint32_t Y, uint32_t Z, uint32_t W) {
+	switch(X) {
+		case 0x0: // printf (TXT)
+			printf((const char*)Y);
+		break;
+
+		case 0x1: // getch (TXT)
+			return getch();
+		break;
+
+		case 0x2: // putc (TXT)
+			putc(Y);
+		break;
+
+		case 0x3:
+			return (uint32_t)init_window(192, 128, (wchar_t*)Y, (int (*)(void *))Z, (void (*)(void *))W);
+		break;
+	}
+
+	return 0x0;
 }
 
 void system_interrupt0() {
